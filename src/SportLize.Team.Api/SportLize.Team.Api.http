@@ -1,0 +1,6 @@
+@SportLize.Team.Api_HostAddress = http://localhost:5253
+
+GET {{SportLize.Team.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

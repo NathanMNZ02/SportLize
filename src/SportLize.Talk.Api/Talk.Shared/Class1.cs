@@ -1,4 +1,4 @@
-﻿namespace Home.Shared;
+﻿namespace Talk.Shared;
 
 public class Class1
 {

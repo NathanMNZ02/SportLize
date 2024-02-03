@@ -5,23 +5,22 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A5555984-FAFC-4CA1-AA0B-79A71F015206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Profile.Api", "src\SportLize.Profile.Api\SportLize.Profile.Api.csproj", "{9D68131D-A826-4A6E-A7E8-B11052611622}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportLize.Profile.Api", "src\SportLize.Profile.Api\SportLize.Profile.Api.csproj", "{9D68131D-A826-4A6E-A7E8-B11052611622}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Group.Api", "src\SportLize.Group.Api\SportLize.Group.Api.csproj", "{59EE2402-1E40-4BE4-975B-2046730FA50E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Home.Api", "src\SportLize.Home.Api\SportLize.Home.Api.csproj", "{69479DD3-4518-4A8F-A15F-C02C0A11CEAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportLize.Group.Api", "src\SportLize.Group.Api\SportLize.Group.Api.csproj", "{59EE2402-1E40-4BE4-975B-2046730FA50E}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4273B1EA-3F4B-4A55-9618-4C34C5F3DD25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Front.Razor", "src\SportLize.Front.Razor\SportLize.Front.Razor.csproj", "{EEE372D0-99C7-45C3-A47F-C18E1798C104}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportLize.Front.Razor", "src\SportLize.Front.Razor\SportLize.Front.Razor.csproj", "{EEE372D0-99C7-45C3-A47F-C18E1798C104}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Talk.Api", "src\SportLize.Talk.Api\SportLize.Talk.Api.csproj", "{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Team.Api", "src\SportLize.Team.Api\SportLize.Team.Api.csproj", "{2833FAE0-502D-462D-9750-F1097BF0F954}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9D68131D-A826-4A6E-A7E8-B11052611622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,10 +31,6 @@ Global
 		{59EE2402-1E40-4BE4-975B-2046730FA50E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59EE2402-1E40-4BE4-975B-2046730FA50E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59EE2402-1E40-4BE4-975B-2046730FA50E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69479DD3-4518-4A8F-A15F-C02C0A11CEAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69479DD3-4518-4A8F-A15F-C02C0A11CEAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69479DD3-4518-4A8F-A15F-C02C0A11CEAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69479DD3-4518-4A8F-A15F-C02C0A11CEAF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4273B1EA-3F4B-4A55-9618-4C34C5F3DD25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4273B1EA-3F4B-4A55-9618-4C34C5F3DD25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4273B1EA-3F4B-4A55-9618-4C34C5F3DD25}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,11 +39,23 @@ Global
 		{EEE372D0-99C7-45C3-A47F-C18E1798C104}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEE372D0-99C7-45C3-A47F-C18E1798C104}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEE372D0-99C7-45C3-A47F-C18E1798C104}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2833FAE0-502D-462D-9750-F1097BF0F954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2833FAE0-502D-462D-9750-F1097BF0F954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2833FAE0-502D-462D-9750-F1097BF0F954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2833FAE0-502D-462D-9750-F1097BF0F954}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9D68131D-A826-4A6E-A7E8-B11052611622} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
 		{59EE2402-1E40-4BE4-975B-2046730FA50E} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
-		{69479DD3-4518-4A8F-A15F-C02C0A11CEAF} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
 		{EEE372D0-99C7-45C3-A47F-C18E1798C104} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
+		{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
+		{2833FAE0-502D-462D-9750-F1097BF0F954} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
 	EndGlobalSection
 EndGlobal

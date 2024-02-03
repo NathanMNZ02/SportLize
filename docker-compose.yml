@@ -48,50 +48,50 @@ services:
       - DB_NAME=SportLizeProfile
       - DB_SA_PASSWORD=postgres
 
-  # POSTGRES FOR HOME
-  sportlize.pgsql.home:
+  # POSTGRES FOR TALK
+  sportlize.pgsql.talk:
     image: postgres:latest
-    container_name: db-sportlize-pgsql-home
+    container_name: db-sportlize-pgsql-talk
     environment:
-      POSTGRES_DB: SportLizeHome
+      POSTGRES_DB: SportLizeTalk
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - 8003:5432
 
-  # HOME
-  sportlize.home.api:
-    container_name: api-sportlize-home
-    image: ${DOCKER_REGISTRY-}sportlizehome
+  # TALK
+  sportlize.talk.api:
+    container_name: api-sportlize-talk
+    image: ${DOCKER_REGISTRY-}sportlizetalk
     build:
-      context: .
-      dockerfile: src/SportLize.Home.Api/Dockerfile
-    environment: 
-      - DB_HOST=sportlize.pgsql.home
-      - DB_NAME=SportLizeHome
-      - DB_SA_PASSWORD=postgres
-
-  # POSTGRES FOR GROUP
-  sportlize.pgsql.group:
-    image: postgres:latest
-    container_name: db-sportlize-pgsql-group
+        context: .
+        dockerfile: src/SportLize.Talk.Api/Dockerfile
     environment:
-      POSTGRES_DB: SportLizeGroup
+      - DB_HOST=sportlize.pgsql.talk
+      - DB_NAME=SportLizeTalk
+      - DB_SA_PASSWORD=postgres
+      
+  # POSTGRES FOR TEAM
+  sportlize.pgsql.team:
+    image: postgres:latest
+    container_name: db-sportlize-pgsql-team
+    environment:
+      POSTGRES_DB: SportLizeTeam
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - 8004:5432
 
-  # GROUP
-  sportlize.group.api:
-    container_name: api-sportlize-group
-    image: ${DOCKER_REGISTRY-}sportlizegroup
+  # TEAM
+  sportlize.team.api:
+    container_name: api-sportlize-team
+    image: ${DOCKER_REGISTRY-}sportlizeteam
     build:
-      context: .
-      dockerfile: src/SportLize.Group.Api/Dockerfile
-    environment: 
-      - DB_HOST=sportlize.pgsql.group
-      - DB_NAME=SportLizeGroup
+        context: .
+        dockerfile: src/SportLize.Team.Api/Dockerfile
+    environment:
+      - DB_HOST=sportlize.pgsql.team
+      - DB_NAME=SportLizeTeam
       - DB_SA_PASSWORD=postgres
 
   # FRONTEND
