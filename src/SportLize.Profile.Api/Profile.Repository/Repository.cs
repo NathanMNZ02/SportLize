@@ -1,460 +1,151 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using SportLize.Profile.Api.Profile.Repository.Abstraction;
-using SportLize.Profile.Api.Profile.Repository.Enumeration;
+﻿using SportLize.Profile.Api.Profile.Repository.Abstraction;
 using SportLize.Profile.Api.Profile.Repository.Model;
-using static System.Net.Mime.MediaTypeNames;
+using SportLize.Profile.Api.Profile.Shared.Dto;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace SportLize.Profile.Api.Profile.Repository
 {
     public class Repository : IRepository
     {
+        private readonly IMapper _mapper;
         private readonly ProfileDbContext _profileDbContext;
 
-        public Repository(ProfileDbContext profileDbContext)
+        public Repository(ProfileDbContext profileDbContext, IMapper mapper)
         {
             _profileDbContext = profileDbContext;
+            _mapper = mapper;
         }
 
-        public async Task<int> SaveChanges()
+        public async Task<int> SaveChanges(CancellationToken cancellationToken = default) =>
+            await _profileDbContext.SaveChangesAsync(cancellationToken);
+
+        #region INSERT
+        public async Task<User> InsertUser(UserWriteDto userWriteDto, CancellationToken cancellationToken = default)
         {
-            return await _profileDbContext.SaveChangesAsync();
+            var user = _mapper.Map<User>(userWriteDto);
+            await _profileDbContext.User.AddAsync(user, cancellationToken);
+            return user;
         }
 
-        #region CREATE
-        /// <summary>
-        /// Le eccezioni vengono invocate nel momento in cui un parametro Dto che è in relazione con un altro non esiste oppure quando
-        /// si prova a creare un user con un nickname già esistente
-        /// </summary>
-        /// <exception cref="Exception"></exception>
-        
-        public async Task CreateUser(Actor actor, string nickname, string name, string surname, string password, string description, DateTime dateOfBorn)
+        public async Task<Post> InsertPost(PostWriteDto postWriteDto, CancellationToken cancellationToken = default)
         {
-  
-                if (await GetUser(nickname) is not null)
-                    throw new Exception($"User with nickname:{nickname} already exist");
-
-                var user = new User()
-                {
-                    Actor = actor,
-                    Nickname = nickname,
-                    Name = name,
-                    Surname = surname,
-                    Password = password,
-                    Description = description,
-                    DateOfBorn = dateOfBorn.ToUniversalTime()
-                };
-
-                await _profileDbContext.User.AddAsync(user);
-                await SaveChanges();
+            var post = _mapper.Map<Post>(postWriteDto);
+            await _profileDbContext.Post.AddAsync(post, cancellationToken);
+            return post;
         }
 
-        public async Task CreateComment(string text, DateTime pubblicationDate, Post post)
+        public async Task<Comment> InsertComment(CommentWriteDto commentWriteDto, CancellationToken cancellationToken = default)
         {
-            var comment = new Comment()
-            {
-                Text = text,
-                Like = 0,
-                PubblicationDate = pubblicationDate.ToUniversalTime(),
-                Post = post,
-                PostId = post.Id
-            };
-
-            await _profileDbContext.Comment.AddAsync(comment);
-            await SaveChanges();
-        }
-
-        public async Task CreatePost(string mediaBase64, DateTime pubblicationDate, string? description, User user)
-        {
-            var post = new Post()
-            {
-                Media = Convert.FromBase64String(mediaBase64),
-                Like = 0,
-                PubblicationDate = pubblicationDate.ToUniversalTime(),
-                Description = description,
-                User = user,
-                UserId = user.Id
-            };
-
-            await _profileDbContext.Post.AddAsync(post);
-            await SaveChanges();
-        }
-
-        public async Task CreatePostInterest(bool bodyBuilding, bool powerLifting, bool crossFit, bool calisthenics, bool swimming, bool surfing, bool kayaking, bool snorkleing, bool skiing, bool snowboarding, bool iceSkating, bool yoga, bool pilates, bool running, bool cycling, bool martialArts, bool rockClimbing, Post post)
-        {
-            var postInterest = new PostInterest()
-            {
-                BodyBuilding = bodyBuilding,
-                PowerLifting = powerLifting,
-                CrossFit = crossFit,
-                Calisthenics = calisthenics,
-                Swimming = swimming,
-                Surfing = surfing,
-                Kayaking = kayaking,
-                Snorkeling = snorkleing,
-                Skiing = skiing,
-                Snowboarding = snowboarding,
-                IceSkating = iceSkating,
-                Yoga = yoga,
-                Pilates = pilates,
-                Running = running,
-                Cycling = cycling,
-                MartialArts = martialArts,
-                RockClimbing = rockClimbing,
-                Post = post,
-                PostId = post.Id
-            };
-
-            await _profileDbContext.PostInterest.AddAsync(postInterest);
-            await SaveChanges();
-        }
-
-        public async Task CreateUserInterest(bool bodyBuilding, bool powerLifting, bool crossFit, bool calisthenics, bool swimming, bool surfing, bool kayaking, bool snorkleing, bool skiing, bool snowboarding, bool iceSkating, bool yoga, bool pilates, bool running, bool cycling, bool martialArts, bool rockClimbing, User user)
-        {
-            var userInterest = new UserInterest()
-            {
-                BodyBuilding = bodyBuilding,
-                PowerLifting = powerLifting,
-                CrossFit = crossFit,
-                Calisthenics = calisthenics,
-                Swimming = swimming,
-                Surfing = surfing,
-                Kayaking = kayaking,
-                Snorkeling = snorkleing,
-                Skiing = skiing,
-                Snowboarding = snowboarding,
-                IceSkating = iceSkating,
-                Yoga = yoga,
-                Pilates = pilates,
-                Running = running,
-                Cycling = cycling,
-                MartialArts = martialArts,
-                RockClimbing = rockClimbing,
-                User = user,
-                UserId = user.Id
-            };
-
-            await _profileDbContext.UserInterest.AddAsync(userInterest);
-            await SaveChanges();
-        }
-        #endregion
-
-        #region ADD
-        public async Task AddFollower(string nicknameUser, string nicknameFollower)
-        {
-            var user = await this.GetUser(nicknameUser);
-            var follower = await this.GetUser(nicknameFollower);
-
-            if (user is null)
-                throw new Exception("User is null");
-
-            if (follower is null)
-                throw new Exception("Follower is null");
-
-            if (user.Followers.Contains(follower) == true)
-                user.Followers.Add(follower);
-
-            if (follower.Following.Contains(user) == false)
-                follower.Following.Add(user);
-
-            await SaveChanges();
-        }
-
-        public async Task AddFollowing(string nicknameUser, string nicknameFollowing)
-        {
-            var user = await this.GetUser(nicknameUser);
-            var following = await this.GetUser(nicknameFollowing);
-            if (user is null)
-                throw new Exception("User is null");
-
-            if (following is null)
-                throw new Exception("Follower is null");
-
-            if (user.Following.Contains(following) == true)
-                throw new Exception($"User: {nicknameUser} already follow user: {nicknameFollowing}");
-
-            user.Following.Add(following);
-
-            /*Aggiungo che user è un nuovo follower di following*/
-
-            if (following.Followers.Contains(user) == false)
-                following.Followers.Add(user);
-
-            await SaveChanges();
-        }
-
-        public async Task AddLikeComment(int id)
-        {
-            var comment = await GetComment(id);
-            if (comment is null)
-                throw new Exception("Comment not exist");
-
-            comment.Like = comment.Like + 1;
-
-            await SaveChanges();
-        }
-
-        public async Task AddLikePost(int id)
-        {
-            var post = await GetPost(id);
-            if (post is null)
-                throw new Exception("Post not exist");
-
-            post.Like = post.Like + 1;
-
-            await SaveChanges();
+            var comment = _mapper.Map<Comment>(commentWriteDto);
+            await _profileDbContext.Comment.AddAsync(comment, cancellationToken);
+            return comment;
         }
         #endregion
 
         #region UPDATE
-        /// <summary>
-        /// Le eccezioni sono dovute al fatto che una chiamata update deve essere fatta su un oggetto esistente, se l'oggetto
-        /// non esiste c'è un problema
-        /// </summary>
-        /// <exception cref="Exception"></exception>
-
-        public async Task UpdateUser(string nickname, string name, string surname, string password, string description, DateTime dateOfBorn)
+        public async Task<User> UpdateUser(UserReadDto oldUserDto, UserWriteDto newUserDto, CancellationToken cancellationToken = default)
         {
-            var user = await GetUser(nickname);
-            if (user is null)
-                throw new Exception("User is null");
+            var user = await _profileDbContext.User.FirstOrDefaultAsync(s => s.Id == oldUserDto.Id, cancellationToken);
 
-            user.Name = name;
-            user.Surname = surname;
-            user.Password = password;
-            user.Description = description;
-            user.DateOfBorn = dateOfBorn.ToUniversalTime();
+            if (user is not null)
+                await DeleteUser(oldUserDto, cancellationToken);
 
-            await SaveChanges();
+            var newUser = _mapper.Map<User>(newUserDto);
+            await _profileDbContext.User.AddAsync(newUser, cancellationToken);
+            return newUser;
         }
 
-        public async Task UpdatePostInterestOfPost(int id, bool bodyBuilding, bool powerLifting, bool crossFit, bool calisthenics, bool swimming, bool surfing, bool kayaking, bool snorkleing, bool skiing, bool snowboarding, bool iceSkating, bool yoga, bool pilates, bool running, bool cycling, bool martialArts, bool rockClimbing)
+        public async Task<Post> UpdatePost(PostReadDto oldPostDto, PostWriteDto newPostDto, CancellationToken cancellationToken = default)
         {
-            var postInterest = await GetPostInterestFromPostId(id);
-            if (postInterest is null)
-                throw new Exception("PostInterest is null");
+            var post = await _profileDbContext.Post.FirstOrDefaultAsync(s => s.Id == oldPostDto.Id, cancellationToken);
 
-            postInterest.BodyBuilding = bodyBuilding;
-            postInterest.PowerLifting = powerLifting;
-            postInterest.CrossFit = crossFit;
-            postInterest.Calisthenics = calisthenics;
-            postInterest.Swimming = swimming;
-            postInterest.Surfing = surfing;
-            postInterest.Kayaking = kayaking;
-            postInterest.Snorkeling = snorkleing;
-            postInterest.Skiing = skiing;
-            postInterest.Snowboarding = snowboarding;
-            postInterest.IceSkating = iceSkating;
-            postInterest.Yoga = yoga;
-            postInterest.Pilates = pilates;
-            postInterest.Running = running;
-            postInterest.Cycling = cycling;
-            postInterest.MartialArts = martialArts;
-            postInterest.RockClimbing = rockClimbing;
+            if (post is not null)
+                await DeletePost(oldPostDto, cancellationToken);
 
-            await SaveChanges();
+            var newPost = _mapper.Map<Post>(newPostDto);
+            await _profileDbContext.Post.AddAsync(newPost, cancellationToken);
+            return newPost;
         }
 
-        public async Task UpdateUserInterest(int id, bool bodyBuilding, bool powerLifting, bool crossFit, bool calisthenics, bool swimming, bool surfing, bool kayaking, bool snorkleing, bool skiing, bool snowboarding, bool iceSkating, bool yoga, bool pilates, bool running, bool cycling, bool martialArts, bool rockClimbing)
+        public async Task<Comment> UpdateComment(CommentReadDto oldCommentDto, CommentWriteDto newCommentDto, CancellationToken cancellationToken = default)
         {
-            var userInterest = await GetUserInterestFromUserId(id);
-            if (userInterest is null)
-                throw new Exception("UserInterest is null");
+            var comment = await _profileDbContext.Comment.FirstOrDefaultAsync(s => s.Id == oldCommentDto.Id, cancellationToken);
 
-            userInterest.BodyBuilding = bodyBuilding;
-            userInterest.PowerLifting = powerLifting;
-            userInterest.CrossFit = crossFit;
-            userInterest.Calisthenics = calisthenics;
-            userInterest.Swimming = swimming;
-            userInterest.Surfing = surfing;
-            userInterest.Kayaking = kayaking;
-            userInterest.Snorkeling = snorkleing;
-            userInterest.Skiing = skiing;
-            userInterest.Snowboarding = snowboarding;
-            userInterest.IceSkating = iceSkating;
-            userInterest.Yoga = yoga;
-            userInterest.Pilates = pilates;
-            userInterest.Running = running;
-            userInterest.Cycling = cycling;
-            userInterest.MartialArts = martialArts;
-            userInterest.RockClimbing = rockClimbing;
+            if (comment is not null)
+                await DeleteComment(oldCommentDto, cancellationToken);
 
-            await SaveChanges();
+            var newComment = _mapper.Map<Comment>(newCommentDto);
+            await _profileDbContext.Comment.AddAsync(newComment, cancellationToken);
+            return newComment;
         }
         #endregion
 
         #region GET
-        #region SPECIFIC
-        public async Task<User?> GetUser(string nickname)
-        {
-            return await _profileDbContext.User.Where(s => s.Nickname == nickname).SingleOrDefaultAsync();
-        }
+        public async Task<List<User>?> GetAllUser(CancellationToken cancellationToken = default) =>
+            await _profileDbContext.User.ToListAsync(cancellationToken);
 
-        public async Task<User?> GetUser(int id)
+        public async Task<List<Post>?> GetAllPostOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            return await _profileDbContext.User.Where(s => s.Id == id).SingleOrDefaultAsync();
-        }
-
-        public async Task<Post?> GetPost(int id)
-        {
-            return await _profileDbContext.Post.Where(s => s.Id == id).SingleOrDefaultAsync();
-        }
-
-        public async Task<Comment?> GetComment(int id)
-        {
-            return await _profileDbContext.Comment.Where(s => s.Id == id).SingleOrDefaultAsync();
-        }
-
-        public async Task<PostInterest?> GetPostInterestFromPostId(int id)
-        {
-            var post = await _profileDbContext.Post.Where(s => s.Id == id).SingleOrDefaultAsync();
-            if (post is null)
-                return null;
-
-            return post.PostInterest;
-        }
-
-        public async Task<UserInterest?> GetUserInterestFromUserNickname(string nickname)
-        {
-            var user = await _profileDbContext.User.Where(s => s.Nickname == nickname).SingleOrDefaultAsync();
+            var user = await GetUser(userReadDto.Id, cancellationToken);
             if (user is null)
                 return null;
-
-            return user.UserInterest;
-        }
-
-        public async Task<UserInterest?> GetUserInterestFromUserId(int id)
-        {
-            var user = await _profileDbContext.User.Where(s => s.Id == id).SingleOrDefaultAsync();
-            if (user is null)
-                return null;
-
-            return user.UserInterest;
-        }
-        #endregion
-
-        #region GENERAL FOR ALL
-        public async Task<IEnumerable<User>?> GetAllUser()
-        {
-            return await _profileDbContext.User.ToListAsync();
-        }
-
-        public async Task<IEnumerable<Post>?> GetAllPost()
-        {
-            return await _profileDbContext.Post.ToListAsync();
-        }
-
-        public async Task<IEnumerable<Comment>?> GetAllComment()
-        {
-            return await _profileDbContext.Comment.ToListAsync();
-        }
-
-        public async Task<IEnumerable<UserInterest>?> GetAllUserInterest()
-        {
-            return await _profileDbContext.UserInterest.ToListAsync();
-        }
-
-        public async Task<IEnumerable<PostInterest>?> GetAllPostInterest()
-        {
-            return await _profileDbContext.PostInterest.ToListAsync();
-        }
-        #endregion
-
-        #region SPECIFIC FOR ALL
-        public async Task<IEnumerable<User>?> GetAllFollowerOfUser(string nickname)
-        {
-            var user = await _profileDbContext.User.Where(x => x.Nickname == nickname).SingleOrDefaultAsync();
-            if (user is null)
-                return null;
-
-            return user.Followers;
-        }
-
-        public async Task<IEnumerable<User>?> GetAllFollowingOfUser(string nickname)
-        {
-            var user = await _profileDbContext.User.Where(x => x.Nickname == nickname).SingleOrDefaultAsync();
-            if (user is null)
-                return null;
-
-            return user.Following;
-        }
-
-        public async Task<IEnumerable<Post>?> GetAllPostOfUser(string nickname)
-        {
-            var user = await _profileDbContext.User.Where(x => x.Nickname == nickname).SingleOrDefaultAsync();
-            if (user is null)
-                return null;
-
             return user.Posts;
         }
 
-        public async Task<IEnumerable<Comment>?> GetAllCommentOfPost(int id)
+        public async Task<List<Comment>?> GetAllComment(PostReadDto postReadDto, CancellationToken cancellationToken = default)
         {
-            var post = await _profileDbContext.Post.Where(x => x.Id == id).SingleOrDefaultAsync();
+            var post = await GetPost(postReadDto.Id, cancellationToken);
             if (post is null)
                 return null;
-
             return post.Comments;
         }
-        #endregion
+
+        public async Task<User?> GetUser(int id, CancellationToken cancellationToken = default) =>
+            await _profileDbContext.User.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+
+        public async Task<Post?> GetPost(int id, CancellationToken cancellationToken = default) =>
+            await _profileDbContext.Post.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+
+        public async Task<Comment?> GetComment(int id, CancellationToken cancellationToken = default) =>
+            await _profileDbContext.Comment.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         #endregion
 
-        #region REMOVE
-        /// <summary>
-        /// Le eccezioni sono dovute al fatto che una chiamata remove deve essere fatta su un oggetto esistente, se l'oggetto
-        /// non esiste c'è un problema
-        /// </summary>
-        /// <exception cref="Exception"></exception>
-
-        public async Task RemoveUser(string nickname)
+        #region DELETE
+        public async Task<User> DeleteUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            var user = await GetUser(nickname);
-            if (user is null)
-                throw new Exception("User not exist");
-
+            var user = _mapper.Map<User>(userReadDto);
             _profileDbContext.User.Remove(user);
-            await SaveChanges();
+            return user;
         }
 
-        public async Task RemovePost(int id)
+        public async Task<Post> DeletePost(PostReadDto postReadDto, CancellationToken cancellationToken = default)
         {
-            var post = await GetPost(id);
-            if (post is null)
-                throw new Exception("Post not exist");
-
+            var post = _mapper.Map<Post>(postReadDto);
             _profileDbContext.Post.Remove(post);
-            await SaveChanges();
+            return post;
         }
 
-        public async Task RemoveComment(int id)
+        public async Task<Comment> DeleteComment(CommentReadDto commentReadDto, CancellationToken cancellationToken = default)
         {
-            var comment = await GetComment(id);
-            if (comment is null)
-                throw new Exception("Comment not exist");
-
+            var comment = _mapper.Map<Comment>(commentReadDto);
             _profileDbContext.Comment.Remove(comment);
-            await SaveChanges();
+            return comment;
         }
+        #endregion
 
-        public async Task RemovePostInterest(int id)
-        {
-            var postInterest = await GetPostInterestFromPostId(id);
-            if (postInterest is null)
-                throw new Exception("PostInterest not exist");
+        #region TRANSACTIONAL OUTBOX
+        public async Task<IEnumerable<TransactionalOutbox>> GetAllTransactionalOutbox(CancellationToken cancellationToken = default) => 
+            await _profileDbContext.TransactionalOutboxes.ToListAsync(cancellationToken);
 
-            _profileDbContext.PostInterest.Remove(postInterest);
-            await SaveChanges();
-        }
+        public async Task<TransactionalOutbox?> GetTransactionalOutboxByKey(long id, CancellationToken cancellationToken = default) =>
+            await _profileDbContext.TransactionalOutboxes.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-        public async Task RemoveUserInterest(string nickname)
-        {
-            var userInterest = await GetUserInterestFromUserNickname(nickname);
-            if (userInterest is null)
-                throw new Exception("UserInterest not exist");
+        public async Task DeleteTransactionalOutbox(long id, CancellationToken cancellationToken = default) =>
+            _profileDbContext.TransactionalOutboxes.Remove((await GetTransactionalOutboxByKey(id, cancellationToken)) ?? throw new ArgumentException($"TransactionalOutbox con id {id} non trovato", nameof(id)));
 
-            _profileDbContext.UserInterest.Remove(userInterest);
-            await SaveChanges();
-        }
+        public async Task InsertTransactionalOutbox(TransactionalOutbox transactionalOutbox, CancellationToken cancellationToken = default) =>
+            await _profileDbContext.TransactionalOutboxes.AddAsync(transactionalOutbox);
         #endregion
     }
 }

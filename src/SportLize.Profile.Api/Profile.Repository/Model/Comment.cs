@@ -5,16 +5,15 @@ namespace SportLize.Profile.Api.Profile.Repository.Model
 {
 	public class Comment
 	{
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+		public string Text { get; set; } = string.Empty;
+		public int Like { get; set; }
+		public DateTime PubblicationDate { get; set; }
 
-		public required string Text { get; set; }
-		public required int Like { get; set; }
-		public required DateTime PubblicationDate { get; set; }
 
-        //Post mapping
-        public required Post Post { get; set; }
+        //Navigation Post
         public required int PostId { get; set; }
+        public required Post Post { get; set; }
     }
 }
 

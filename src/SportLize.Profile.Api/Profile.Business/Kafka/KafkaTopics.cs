@@ -2,10 +2,10 @@
 
 namespace SportLize.Profile.Api.Profile.Business.Kafka
 {
-	public class KafkaTopics 
+	public class KafkaTopics : AbstractKafkaTopics
 	{
 		public string User { get; set; } = "User";
-		public IEnumerable<string> GetTopics() => new List<string>() { User };
-	}
+        public override IEnumerable<string> GetTopics() => new List<string>() { User };
+    }
 }
 

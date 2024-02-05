@@ -33,23 +33,25 @@ namespace SportLize.Profile.Api.Profile.Repository
             modelBuilder.Entity<User>().ToTable("User");
             modelBuilder.Entity<Post>().ToTable("Post");
             modelBuilder.Entity<Comment>().ToTable("Comment");
-            modelBuilder.Entity<UserInterest>().ToTable("UserInterest");
-            modelBuilder.Entity<PostInterest>().ToTable("PostInterest");
+            modelBuilder.Entity<TransactionalOutbox>().ToTable("TransactionalOutbox");         
 
             modelBuilder.Entity<User>().HasKey(s => s.Id);
             modelBuilder.Entity<Post>().HasKey(s => s.Id );
             modelBuilder.Entity<Comment>().HasKey(s => s.Id);
-            modelBuilder.Entity<UserInterest>().HasKey(s => s.Id);
-            modelBuilder.Entity<PostInterest>().HasKey(s => s.Id);
+            modelBuilder.Entity<TransactionalOutbox>().HasKey(s=> s.Id);
 
-            //Relation one to one
-            modelBuilder.Entity<User>().HasOne(s => s.UserInterest).WithOne(s => s.User).HasForeignKey<UserInterest>(s => s.UserId);
+            modelBuilder.Entity<User>().Property(s => s.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Post>().Property(s => s.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Comment>().Property(s => s.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<TransactionalOutbox>().Property(s => s.Id).ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<Post>().HasOne(s => s.PostInterest).WithOne(s => s.Post).HasForeignKey<PostInterest>(s => s.PostId);
+            //Relation one to many
+            modelBuilder.Entity<User>().HasMany(s => s.Posts).WithOne(s => s.User).HasForeignKey(s => s.UserId);
+            modelBuilder.Entity<Post>().HasMany(S => S.Comments).WithOne(s => s.Post).HasForeignKey(s => s.PostId).IsRequired();
 
             //Many to many
-            modelBuilder.Entity<User>().HasMany(u => u.Followers).WithMany();
-            modelBuilder.Entity<User>().HasMany(u => u.Following).WithMany();
+            modelBuilder.Entity<User>().HasMany(u => u.Followers).WithMany().UsingEntity("UserFollower");
+            modelBuilder.Entity<User>().HasMany(u => u.Following).WithMany().UsingEntity("UserFollowing");
 
 
             base.OnModelCreating(modelBuilder);
@@ -59,9 +61,8 @@ namespace SportLize.Profile.Api.Profile.Repository
 		public DbSet<Post> Post { get; set; }
 		public DbSet<Comment> Comment { get; set; }
 
-        //Interest
-        public DbSet<UserInterest> UserInterest { get; set; }
-        public DbSet<PostInterest> PostInterest { get; set; }
+        /*TRANSACTIONAL*/
+        public DbSet<TransactionalOutbox> TransactionalOutboxes { get; set; }
 	}
 }
 

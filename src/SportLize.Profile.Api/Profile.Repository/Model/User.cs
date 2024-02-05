@@ -6,27 +6,21 @@ namespace SportLize.Profile.Api.Profile.Repository.Model
 {
 	public class User
 	{
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
-		public required Actor Actor { get; set; }
-		public required string Nickname { get; set; }
-		public required string Name { get; set; }
-		public required string Surname { get; set; }
-		public required string Password { get; set; }
-		public required string Description { get; set; }
-        public required DateTime DateOfBorn { get; set; }
-
-		//Interest Mapping
-		public UserInterest? UserInterest { get; set; } //Inizialmente a null, poi verranno inseriti sempre in fase di creazione
-        public int? UserInterestId { get; set; }
+		public Actor Actor { get; set; }
+		public string Nickname { get; set; } = string.Empty;
+		public string Name { get; set; } = string.Empty;
+		public string Surname { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
+		public string Description { get; set; } = string.Empty;
+        public DateTime DateOfBorn { get; set; }
 
 
-        //Followers Mapping
+        //Navigation Followers/Following 
         public List<User> Followers { get; } = new List<User>();
         public List<User> Following { get; } = new List<User>();
 
-        //Post Mapping
+        //Navigation Post
         public List<Post>? Posts { get; set; }
 	}
 }
