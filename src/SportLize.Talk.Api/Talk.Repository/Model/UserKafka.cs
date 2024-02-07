@@ -1,7 +1,6 @@
-﻿
-using SportLize.Team.Api.Team.Repository.Enumeration;
+﻿using SportLize.Talk.Api.Talk.Repository.Enumeration;
 
-namespace SportLize.Team.Api.Team.Repository.Model
+namespace SportLize.Talk.Api.Talk.Repository.Model
 {
     public class UserKafka
     {
@@ -14,9 +13,7 @@ namespace SportLize.Team.Api.Team.Repository.Model
         public string Description { get; set; } = string.Empty;
         public DateTime DateOfBorn { get; set; } = DateTime.UtcNow;
 
-
-        //Navigation
-        public int GroupId { get; set; }
-        public Group? Group { get; set; }
+        //Navigation Chat
+        public List<Chat> Chats { get; set; } = new List<Chat>();
     }
 }

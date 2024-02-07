@@ -7,6 +7,6 @@
 
         //Navigation Chat
         public int ChatId { get; set; }
-        public required Chat Chat { get; set; }
+        public Chat? Chat { get; set; }
     }
 }

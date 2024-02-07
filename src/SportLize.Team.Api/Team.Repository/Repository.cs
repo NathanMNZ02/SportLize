@@ -33,30 +33,50 @@ public class Repository : IRepository
         return message;
     }
 
-    public async Task<UserKafka> InsertUserKafka(UserKafkaWriteDto userKafkaWriteDto, CancellationToken cancellationToken = default)
+    public async Task<UserKafka> InsertUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
     {
-        var userKafka = _mapper.Map<UserKafka>(userKafkaWriteDto);
         await _teamDbContext.UserKafka.AddAsync(userKafka);
         return userKafka;
     }
     #endregion
 
     #region UPDATE
-    public async Task<Group> UpdateGroup(GroupReadDto oldGroupReadDto, GroupWriteDto newGroupWriteDto, CancellationToken cancellationToken = default)
+    public async Task<Group> UpdateGroup(GroupReadDto oldGroupDto, GroupWriteDto newGroupDto, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var group = await _teamDbContext.Group.FirstOrDefaultAsync(s => s.Id == oldGroupDto.Id, cancellationToken);
+
+        if (group is not null)
+            await DeleteGroup(oldGroupDto, cancellationToken);
+
+        var newGroup = _mapper.Map<Group>(newGroupDto);
+        await _teamDbContext.Group.AddAsync(newGroup, cancellationToken);
+        return newGroup;
     }
 
-    public async Task<Message> UpdateMessage(MessageReadDto oldMessageReadDto, MessageWriteDto newMessageWriteDto, CancellationToken cancellationToken = default)
+    public async Task<Message> UpdateMessage(MessageReadDto oldMessageDto, MessageWriteDto newMessageDto, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var message = await _teamDbContext.UserKafka.FirstOrDefaultAsync(s => s.Id == oldMessageDto.Id, cancellationToken);
+
+        if (message is not null)
+            await DeleteMessage(oldMessageDto, cancellationToken);
+
+        var newMessage = _mapper.Map<Message>(newMessageDto);
+        await _teamDbContext.Message.AddAsync(newMessage, cancellationToken);
+        return newMessage;
     }
 
-    public async Task<UserKafka> UpdateUserKafka(UserKafkaReadDto oldUserKafkaReadDto, UserKafkaWriteDto newUserKafkaWriteDto, CancellationToken cancellationToken = default)
+    public async Task<UserKafka> UpdateUserKafka(UserKafka oldUserKafka, UserKafka newUserKafka, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var user = await _teamDbContext.UserKafka.FirstOrDefaultAsync(s => s.Id == oldUserKafka.Id, cancellationToken);
+
+        if (user is not null)
+            await DeleteUserKafka(oldUserKafka, cancellationToken);
+
+        await _teamDbContext.UserKafka.AddAsync(newUserKafka, cancellationToken);
+        return newUserKafka;
     }
     #endregion
+
 
     #region GET
     public async Task<List<Group>?> GetAllGroup(CancellationToken cancellationToken = default) => await _teamDbContext.Group.ToListAsync();
@@ -103,9 +123,8 @@ public class Repository : IRepository
         return message;
     }
 
-    public async Task<UserKafka> DeleteUserKafka(UserKafkaReadDto userKafkaReadDto, CancellationToken cancellationToken = default)
+    public async Task<UserKafka> DeleteUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
     {
-        var userKafka = _mapper.Map<UserKafka>(userKafkaReadDto);
         _teamDbContext.UserKafka.Remove(userKafka);
         return userKafka;
     }

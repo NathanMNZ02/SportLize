@@ -1,6 +1,8 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SportLize.Profile.Api.Profile.Business;
 using SportLize.Profile.Api.Profile.Business.Abstraction;
+using SportLize.Profile.Api.Profile.Business.Profiles;
 using SportLize.Profile.Api.Profile.ClientHttp;
 using SportLize.Profile.Api.Profile.ClientHttp.Abstraction;
 using SportLize.Profile.Api.Profile.Repository;
@@ -15,10 +17,11 @@ string? dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
 builder.Services.AddDbContext<ProfileDbContext>(options =>
     options.UseNpgsql($"Host={dbHost};Database={dbName};Username=postgres;Password={dbPassword}"));
 
+builder.Services.AddControllers();
+
+builder.Services.AddScoped<IMapper, Mapper>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IBusiness, Business>();
-
-builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

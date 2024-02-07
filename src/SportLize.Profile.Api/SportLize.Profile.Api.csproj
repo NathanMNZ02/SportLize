@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.1" />
-    <PackageReference Include="Utility.Kafka" Version="1.0.0" />
+    <PackageReference Include="Utility.Kafka" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +37,5 @@
     <Folder Include="Profile.Business\Abstraction\" />
     <Folder Include="Controller\" />
     <Folder Include="Profile.ClientHttp\Abstraction\" />
-    <Folder Include="Profile.Business\Kafka\" />
   </ItemGroup>
 </Project>

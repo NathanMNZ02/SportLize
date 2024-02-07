@@ -2,8 +2,13 @@
 {
     public class Chat
     {
-        public required int From { get; set; } //Chiamata con kafka per ottenere User
-        public required int To { get; set; } //Chiamata con kafka per ottenere User
+        public int Id { get; set; }
+
+        //Navigation Chat
+        public int FromId { get; set; }
+        public UserKafka From { get; set; } = new UserKafka();
+        public int ToId { get; set; }
+        public UserKafka To { get; set; } = new UserKafka();
 
         //Navigation Message
         public List<Message> Messages { get; set; } = new List<Message>();

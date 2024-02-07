@@ -10,14 +10,14 @@ namespace SportLize.Team.Api.Team.Repository.Abstraction
         #region INSERT
         Task<Group> InsertGroup(GroupWriteDto groupWriteDto,CancellationToken cancellationToken = default);
         Task<Message> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default);
-        Task<UserKafka> InsertUserKafka(UserKafkaWriteDto userKafkaWriteDto, CancellationToken cancellationToken = default);
+        Task<UserKafka> InsertUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default);
 
         #endregion
 
         #region UPDATE
         Task<Group> UpdateGroup(GroupReadDto oldGroupReadDto, GroupWriteDto newGroupWriteDto, CancellationToken cancellationToken = default);
         Task<Message> UpdateMessage(MessageReadDto oldMessageReadDto, MessageWriteDto newMessageWriteDto, CancellationToken cancellationToken = default);
-        Task<UserKafka> UpdateUserKafka(UserKafkaReadDto oldUserKafkaReadDto, UserKafkaWriteDto newUserKafkaWriteDto, CancellationToken cancellationToken = default);
+        Task<UserKafka> UpdateUserKafka(UserKafka oldUserKafka, UserKafka newUserKafka, CancellationToken cancellationToken = default);
         #endregion
 
         #region GET
@@ -32,7 +32,7 @@ namespace SportLize.Team.Api.Team.Repository.Abstraction
         #region DELETE
         Task<Group> DeleteGroup(GroupReadDto groupId, CancellationToken cancellationToken = default);
         Task<Message> DeleteMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default);
-        Task<UserKafka> DeleteUserKafka(UserKafkaReadDto userKafkaReadDto, CancellationToken cancellationToken = default);
+        Task<UserKafka> DeleteUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default);
         #endregion
 
         #region TRANSACTIONALOUTBOX

@@ -16,7 +16,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageReference Include="Utility.Kafka" Version="1.0.0" />
+    <PackageReference Include="Utility.Kafka" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SportLize.Profile.Api\SportLize.Profile.Api.csproj" />
   </ItemGroup>
 
 </Project>
