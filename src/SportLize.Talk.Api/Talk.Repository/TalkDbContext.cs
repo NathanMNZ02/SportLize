@@ -5,27 +5,12 @@ using SportLize.Talk.Api.Talk.Repository.Model;
 
 namespace SportLize.Talk.Api.Talk.Repository
 {
+
     public class TalkDbContext : DbContext
     {
         public TalkDbContext(DbContextOptions<TalkDbContext> options) : base(options)
         {
-            try
-            {
-                if (Database.GetService<IDatabaseCreator>() is RelationalDatabaseCreator databaseCreator)
-                {
-                    if (!databaseCreator.CanConnect())
-                        databaseCreator.Create();
-
-                    if (!databaseCreator.HasTables())
-                        databaseCreator.CreateTables();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserKafka>().ToTable("UserKafka");
@@ -44,8 +29,8 @@ namespace SportLize.Talk.Api.Talk.Repository
             modelBuilder.Entity<TransactionalOutbox>().Property(s => s.Id).ValueGeneratedOnAdd();
 
             modelBuilder.Entity<Chat>().HasMany(s=> s.Messages).WithOne(s=> s.Chat).HasForeignKey(s=> s.ChatId).IsRequired();
-            modelBuilder.Entity<UserKafka>().HasMany(s=> s.Chats).WithOne(s=> s.From).HasForeignKey(s=> s.FromId).IsRequired();
-            modelBuilder.Entity<UserKafka>().HasMany(s => s.Chats).WithOne(s => s.To).HasForeignKey(s => s.ToId).IsRequired();
+            modelBuilder.Entity<Chat>().HasOne(s => s.Sender).WithMany(s => s.SentChats).HasForeignKey(s => s.SenderId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Chat>().HasOne(s => s.Receiver).WithMany(s => s.ReceivedChats).HasForeignKey(s => s.ReceiverId).OnDelete(DeleteBehavior.Restrict);
             base.OnModelCreating(modelBuilder);
         }
 

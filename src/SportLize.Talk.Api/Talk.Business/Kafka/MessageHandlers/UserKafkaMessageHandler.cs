@@ -2,7 +2,6 @@
 using SportLize.Profile.Api.Profile.Shared.Dto;
 using SportLize.Talk.Api.Talk.Repository.Abstraction;
 using SportLize.Talk.Api.Talk.Repository.Model;
-using SportLize.Talk.Api.Talk.Shared.Dto;
 
 namespace SportLize.Talk.Api.Talk.Business.Kafka.MessageHandlers
 {

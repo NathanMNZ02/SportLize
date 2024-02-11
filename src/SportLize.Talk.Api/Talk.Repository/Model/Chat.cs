@@ -5,10 +5,10 @@
         public int Id { get; set; }
 
         //Navigation Chat
-        public int FromId { get; set; }
-        public UserKafka From { get; set; } = new UserKafka();
-        public int ToId { get; set; }
-        public UserKafka To { get; set; } = new UserKafka();
+        public int SenderId { get; set; }
+        public UserKafka Sender { get; set; } = new UserKafka();
+        public int ReceiverId { get; set; }
+        public UserKafka Receiver { get; set; } = new UserKafka();
 
         //Navigation Message
         public List<Message> Messages { get; set; } = new List<Message>();

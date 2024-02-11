@@ -14,7 +14,7 @@ namespace SportLize.Profile.Api.Profile.Business.Factory
         public static TransactionalOutbox CreateDelete(UserReadDto userReadDto) => Create(userReadDto, Operations.Delete);
         #endregion
 
-        private static TransactionalOutbox Create(UserReadDto userReadDto, string operation) => Create(nameof(userReadDto), userReadDto, operation);
+        private static TransactionalOutbox Create(UserReadDto userReadDto, string operation) => Create(nameof(User), userReadDto, operation);
         private static TransactionalOutbox Create<TDTO>(string table, TDTO dto, string operation) where TDTO : class, new()
         {
             OperationMessage<TDTO> operationMessage = new OperationMessage<TDTO>()

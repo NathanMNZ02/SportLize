@@ -5,24 +5,26 @@ namespace SportLize.Talk.Api.Talk.Repository.Abstraction
 {
     public interface IRepository
     {
-        Task<int> SaveChanges();
+        Task<int> SaveChanges(CancellationToken cancellationToken = default);
 
         #region INSERT
         Task<UserKafka> InsertUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default);
-        Task<Chat> InsertChat(ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default);
-        Task<Message> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default);
+        Task<Chat> InsertChatForSender(int userId, ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default);
+        Task<Chat> InsertChatForReceiver(int userId, ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default);
+        Task<Message> InsertMessageInChat(int chatId, MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default);
         #endregion
 
         #region UPDATE
-        Task<UserKafka> UpdateUserKafka(UserKafka oldUserKafka, UserKafka newUserKafka, CancellationToken cancellationToken = default);
-        Task<Chat> UpdateChat(ChatReadDto oldChatDto, ChatWriteDto newChatDto, CancellationToken cancellationToken = default);
-        Task<Message> UpdateMessage(MessageReadDto oldMessageDto, MessageWriteDto newMessageDto, CancellationToken cancellationToken = default);
+        Task<UserKafka> UpdateUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default);
+        Task<Chat> UpdateChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default);
+        Task<Message> UpdateMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default);
         #endregion
 
         #region GET
         Task<List<UserKafka>?> GetAllUsers(CancellationToken cancellationToken = default);
-        Task<List<Chat>?> GetAllChatOfUser(UserKafka userKafka, CancellationToken cancellationToken = default);
-        Task<List<Message>?> GetAllMessagesOfChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default);
+        Task<List<Chat>?> GetAllSentChatOfUser(int userId, CancellationToken cancellationToken = default);
+        Task<List<Chat>?> GetAllReceivedChatOfUser(int userId, CancellationToken cancellationToken = default);
+        Task<List<Message>?> GetAllMessagesOfChat(int chatId, CancellationToken cancellationToken = default);
         Task<UserKafka?> GetUser(int id, CancellationToken cancellationToken = default);
         Task<Chat?> GetChat(int id, CancellationToken cancellationToken = default); 
         Task<Message?> GetMessage(int id, CancellationToken cancellationToken = default);

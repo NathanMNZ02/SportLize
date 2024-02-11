@@ -1,4 +1,5 @@
 ﻿using SportLize.Team.Api.Team.Repository.Model;
+using SportLize.Team.Api.Team.Repository.Enumeration;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SportLize.Team.Api.Team.Repository.Model

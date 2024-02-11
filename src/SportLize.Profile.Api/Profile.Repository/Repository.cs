@@ -8,13 +8,30 @@ namespace SportLize.Profile.Api.Profile.Repository
 {
     public class Repository : IRepository
     {
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly ProfileDbContext _profileDbContext;
 
-        public Repository(ProfileDbContext profileDbContext, IMapper mapper)
+        public Repository(ProfileDbContext profileDbContext, IMapper mapper, ILogger<Repository> logger)
         {
-            _profileDbContext = profileDbContext;
             _mapper = mapper;
+            _profileDbContext = profileDbContext;
+            _logger = logger;
+            _profileDbContext.Database.Migrate();
+
+            _profileDbContext.SavedChanges += _profileDbContext_SavedChanges;
+            _profileDbContext.SaveChangesFailed += _profileDbContext_SaveChangesFailed;
+        }
+
+        private void _profileDbContext_SavedChanges(object? sender, SavedChangesEventArgs e)
+        {
+            _logger.LogInformation($"Saved of {e.EntitiesSavedCount} entity successfully");
+        }
+
+        private void _profileDbContext_SaveChangesFailed(object? sender, SaveChangesFailedEventArgs e)
+        {
+            _logger.LogError(e.Exception.Message);
+            _logger.LogError(e.Exception.StackTrace);
         }
 
         public async Task<int> SaveChanges(CancellationToken cancellationToken = default) =>
@@ -28,56 +45,83 @@ namespace SportLize.Profile.Api.Profile.Repository
             return user;
         }
 
-        public async Task<Post> InsertPost(PostWriteDto postWriteDto, CancellationToken cancellationToken = default)
+        public async Task<User?> InsertFollowerToUser(int userId, int followerId, CancellationToken cancellationToken = default)
+        {
+            var user = await GetUser(userId, cancellationToken);
+            var follower = await GetUser(followerId);
+
+            if (user is not null)
+                if(follower is not null)
+                if (user.Followers.FirstOrDefault(x => x.Id == followerId) is null)
+                    user.Followers.Add(follower);
+
+            return user;
+        }
+
+        public async Task<User?> InsertFollowingToUser(int userId, int followingId, CancellationToken cancellationToken = default)
+        {
+            var user = await GetUser(userId, cancellationToken);
+            var following = await GetUser(followingId);
+
+            if (user is not null)
+                if (following is not null)
+                    if (user.Followers.FirstOrDefault(x => x.Id == followingId) is null)
+                        user.Followers.Add(following);
+
+            return user;
+        }
+
+        public async Task<Post> InsertPostForUser(int userId, PostWriteDto postWriteDto, CancellationToken cancellationToken = default)
         {
             var post = _mapper.Map<Post>(postWriteDto);
-            await _profileDbContext.Post.AddAsync(post, cancellationToken);
+
+            var user = await GetUser(userId);
+            if (user is not null)
+            {
+                post.UserId = user.Id;
+                post.User = user;
+                user.Posts.Add(post);
+            }
+
             return post;
         }
 
-        public async Task<Comment> InsertComment(CommentWriteDto commentWriteDto, CancellationToken cancellationToken = default)
-        {
+        public async Task<Comment> InsertCommentForPost(int postId, CommentWriteDto commentWriteDto, CancellationToken cancellationToken = default)
+        {           
             var comment = _mapper.Map<Comment>(commentWriteDto);
-            await _profileDbContext.Comment.AddAsync(comment, cancellationToken);
+
+            var post = await GetPost(postId, cancellationToken);
+            if (post is not null)
+            {
+                comment.PostId = postId;
+                comment.Post = post;
+                post.Comments.Add(comment);
+            }
+
             return comment;
         }
         #endregion
 
         #region UPDATE
-        public async Task<User> UpdateUser(UserReadDto oldUserDto, UserWriteDto newUserDto, CancellationToken cancellationToken = default)
+        public async Task<User> UpdateUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            var user = await _profileDbContext.User.FirstOrDefaultAsync(s => s.Id == oldUserDto.Id, cancellationToken);
-
-            if (user is not null)
-                await DeleteUser(oldUserDto, cancellationToken);
-
-            var newUser = _mapper.Map<User>(newUserDto);
-            await _profileDbContext.User.AddAsync(newUser, cancellationToken);
-            return newUser;
+            var user = _mapper.Map<User>(userReadDto);
+            _profileDbContext.User.Update(user);
+            return user;
         }
 
-        public async Task<Post> UpdatePost(PostReadDto oldPostDto, PostWriteDto newPostDto, CancellationToken cancellationToken = default)
+        public async Task<Post> UpdatePost(PostReadDto postReadDto, CancellationToken cancellationToken = default)
         {
-            var post = await _profileDbContext.Post.FirstOrDefaultAsync(s => s.Id == oldPostDto.Id, cancellationToken);
-
-            if (post is not null)
-                await DeletePost(oldPostDto, cancellationToken);
-
-            var newPost = _mapper.Map<Post>(newPostDto);
-            await _profileDbContext.Post.AddAsync(newPost, cancellationToken);
-            return newPost;
+            var post = _mapper.Map<Post>(postReadDto);
+            _profileDbContext.Post.Update(post);
+            return post;
         }
 
-        public async Task<Comment> UpdateComment(CommentReadDto oldCommentDto, CommentWriteDto newCommentDto, CancellationToken cancellationToken = default)
+        public async Task<Comment> UpdateComment(CommentReadDto commentReadDto, CancellationToken cancellationToken = default)
         {
-            var comment = await _profileDbContext.Comment.FirstOrDefaultAsync(s => s.Id == oldCommentDto.Id, cancellationToken);
-
-            if (comment is not null)
-                await DeleteComment(oldCommentDto, cancellationToken);
-
-            var newComment = _mapper.Map<Comment>(newCommentDto);
-            await _profileDbContext.Comment.AddAsync(newComment, cancellationToken);
-            return newComment;
+            var comment = _mapper.Map<Comment>(commentReadDto);
+            _profileDbContext.Comment.Update(comment);
+            return comment;
         }
         #endregion
 
@@ -85,20 +129,32 @@ namespace SportLize.Profile.Api.Profile.Repository
         public async Task<List<User>?> GetAllUser(CancellationToken cancellationToken = default) =>
             await _profileDbContext.User.ToListAsync(cancellationToken);
 
-        public async Task<List<Post>?> GetAllPostOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
+        public async Task<List<User>?> GetAllFollowerOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            var user = await GetUser(userReadDto.Id, cancellationToken);
-            if (user is null)
-                return null;
-            return user.Posts;
+            var user = await _profileDbContext.User.Include(x=> x.Followers).FirstOrDefaultAsync(x=> x.Id == userReadDto.Id);
+            if (user is not null)
+                return user.Followers;
+            return null;
         }
 
-        public async Task<List<Comment>?> GetAllComment(PostReadDto postReadDto, CancellationToken cancellationToken = default)
+        public async Task<List<User>?> GetAllFollowingOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            var post = await GetPost(postReadDto.Id, cancellationToken);
-            if (post is null)
-                return null;
-            return post.Comments;
+            var user = await GetUser(userReadDto.Id, cancellationToken);
+            if (user is not null)
+                return _profileDbContext.User.Where(x=> x.Followers.Contains(user)).ToList();
+            return null;
+        }
+
+        public async Task<List<Post>?> GetAllPostOfUser(int userId, CancellationToken cancellationToken = default)
+        {
+            var user = await _profileDbContext.User.Include(u => u.Posts).FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            return user?.Posts;
+        }
+
+        public async Task<List<Comment>?> GetAllCommentOfPost(int postId, CancellationToken cancellationToken = default)
+        {
+            var post = await _profileDbContext.Post.Include(u => u.Comments).FirstOrDefaultAsync(u => u.Id == postId, cancellationToken);
+            return post?.Comments;
         }
 
         public async Task<User?> GetUser(int id, CancellationToken cancellationToken = default) =>

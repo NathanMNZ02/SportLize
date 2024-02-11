@@ -15,13 +15,11 @@ namespace SportLize.Profile.Api.Profile.Repository.Model
 		public string Description { get; set; } = string.Empty;
         public DateTime DateOfBorn { get; set; }
 
-
         //Navigation Followers/Following 
         public List<User> Followers { get; } = new List<User>();
-        public List<User> Following { get; } = new List<User>();
 
-        //Navigation Post
-        public List<Post>? Posts { get; set; }
+		//Navigation Post
+		public List<Post> Posts { get; set; } = new List<Post>();
 	}
 }
 

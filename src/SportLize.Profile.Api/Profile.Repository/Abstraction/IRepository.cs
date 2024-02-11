@@ -11,20 +11,24 @@ namespace SportLize.Profile.Api.Profile.Repository.Abstraction
 
         #region INSERT
         Task<User> InsertUser(UserWriteDto userWriteDto, CancellationToken cancellationToken = default);
-        Task<Post> InsertPost(PostWriteDto postWriteDto, CancellationToken cancellationToken = default);
-        Task<Comment> InsertComment(CommentWriteDto commentWriteDto, CancellationToken cancellationToken = default);
+        Task<Post?> InsertPostForUser(int userId, PostWriteDto postWriteDto, CancellationToken cancellationToken = default);
+        Task<User?> InsertFollowerToUser(int userId, int followerId, CancellationToken cancellationToken = default);
+        Task<User?> InsertFollowingToUser(int userId, int followerId, CancellationToken cancellationToken = default);
+        Task<Comment> InsertCommentForPost(int postId, CommentWriteDto commentWriteDto, CancellationToken cancellationToken = default);
         #endregion
 
         #region UPDATE
-        Task<User> UpdateUser(UserReadDto oldUser, UserWriteDto newUser, CancellationToken cancellationToken = default);
-        Task<Post> UpdatePost(PostReadDto oldPost, PostWriteDto newPost, CancellationToken cancellationToken = default);
-        Task<Comment> UpdateComment(CommentReadDto oldComment, CommentWriteDto newComment, CancellationToken cancellationToken = default);
+        Task<User> UpdateUser(UserReadDto userReadDto, CancellationToken cancellationToken = default);
+        Task<Post> UpdatePost(PostReadDto postReadDto, CancellationToken cancellationToken = default);
+        Task<Comment> UpdateComment(CommentReadDto commentReadDto, CancellationToken cancellationToken = default);
         #endregion
 
         #region GET
         Task<List<User>?> GetAllUser(CancellationToken cancellationToken = default);
-        Task<List<Post>?> GetAllPostOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default);
-        Task<List<Comment>?> GetAllComment(PostReadDto postReadDto, CancellationToken cancellationToken = default);
+        Task<List<User>?> GetAllFollowerOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default);
+        Task<List<User>?> GetAllFollowingOfUser(UserReadDto userReadDto, CancellationToken cancellationToken = default);
+        Task<List<Post>?> GetAllPostOfUser(int userId, CancellationToken cancellationToken = default);
+        Task<List<Comment>?> GetAllCommentOfPost(int postId, CancellationToken cancellationToken = default);
         Task<User?> GetUser(int id, CancellationToken cancellationToken = default);
         Task<Post?> GetPost(int id, CancellationToken cancellationToken = default);
         Task<Comment?> GetComment(int id, CancellationToken cancellationToken = default);

@@ -11,23 +11,7 @@ namespace SportLize.Profile.Api.Profile.Repository
 	{
         public ProfileDbContext(DbContextOptions<ProfileDbContext> options) : base(options)
         {
-            try
-            {
-                if (Database.GetService<IDatabaseCreator>() is RelationalDatabaseCreator databaseCreator)
-                {
-                    if (!databaseCreator.CanConnect())
-                        databaseCreator.Create();
-
-                    if (!databaseCreator.HasTables())
-                        databaseCreator.CreateTables();
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("User");
@@ -47,12 +31,7 @@ namespace SportLize.Profile.Api.Profile.Repository
 
             //Relation one to many
             modelBuilder.Entity<User>().HasMany(s => s.Posts).WithOne(s => s.User).HasForeignKey(s => s.UserId);
-            modelBuilder.Entity<Post>().HasMany(S => S.Comments).WithOne(s => s.Post).HasForeignKey(s => s.PostId).IsRequired();
-
-            //Many to many
-            modelBuilder.Entity<User>().HasMany(u => u.Followers).WithMany().UsingEntity("UserFollower");
-            modelBuilder.Entity<User>().HasMany(u => u.Following).WithMany().UsingEntity("UserFollowing");
-
+            modelBuilder.Entity<Post>().HasMany(S => S.Comments).WithOne(s => s.Post).HasForeignKey(s => s.PostId);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -11,7 +11,6 @@ namespace SportLize.Team.Api.Team.Repository.Abstraction
         Task<Group> InsertGroup(GroupWriteDto groupWriteDto,CancellationToken cancellationToken = default);
         Task<Message> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default);
         Task<UserKafka> InsertUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default);
-
         #endregion
 
         #region UPDATE

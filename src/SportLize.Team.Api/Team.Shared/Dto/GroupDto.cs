@@ -1,4 +1,5 @@
 ﻿using SportLize.Team.Api.Team.Repository.Model;
+using SportLize.Team.Api.Team.Repository.Enumeration;
 
 namespace SportLize.Team.Api.Team.Shared.Dto
 {

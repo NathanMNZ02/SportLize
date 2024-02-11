@@ -2,7 +2,7 @@
 {
     public class PostWriteDto
     {
-        public byte[] Media { get; set; } = new byte[0];
+        public string Media64 { get; set; } = string.Empty;
         public int Like { get; set; }
         public DateTime PubblicationDate { get; set; }
         public string Description { get; set; } = string.Empty;
@@ -11,7 +11,7 @@
     public class PostReadDto
     {
         public int Id { get; set; }
-        public byte[] Media { get; set; } = new byte[0];
+        public string Media64 { get; set; } = string.Empty;
         public int Like { get; set; }
         public DateTime PubblicationDate { get; set; }
         public string Description { get; set; } = string.Empty;

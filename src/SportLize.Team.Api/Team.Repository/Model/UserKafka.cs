@@ -1,5 +1,4 @@
-﻿
-using SportLize.Team.Api.Team.Repository.Enumeration;
+﻿using SportLize.Profile.Api.Profile.Repository.Enumeration;
 
 namespace SportLize.Team.Api.Team.Repository.Model
 {

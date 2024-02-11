@@ -1,0 +1,23 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "TeamDbContext": "Server=host.docker.internal,2433;Database=SportLizeTeam;User Id=sa;Password=p4ssw0rD;Encrypt=False"
+  },
+  "Kafka": {
+    "ConsumerClient": {
+      "BootstrapServers": "host.docker.internal:9092",
+      "GroupId": "UserTake"
+    },
+    "AdminClient": {
+      "BootstrapServers": "host.docker.internal:9092"
+    },
+    "Topics": {
+      "User": "User"
+    }
+  }
+}

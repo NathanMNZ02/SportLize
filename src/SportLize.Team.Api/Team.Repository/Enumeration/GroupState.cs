@@ -1,4 +1,4 @@
-﻿namespace SportLize.Team.Api.Team.Repository.Model
+﻿namespace SportLize.Team.Api.Team.Repository.Enumeration
 {
     public enum GroupState
     {

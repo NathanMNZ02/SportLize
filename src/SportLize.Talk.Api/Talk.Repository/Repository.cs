@@ -14,9 +14,10 @@ namespace SportLize.Talk.Api.Talk.Repository
         {
             _mapper = mapper;
             _talkDbContext = talkDbContext;
+            _talkDbContext.Database.Migrate();
         }
 
-        public async Task<int> SaveChanges()
+        public async Task<int> SaveChanges(CancellationToken cancellationToken = default)
         {
             return await _talkDbContext.SaveChangesAsync();
         }
@@ -28,75 +29,92 @@ namespace SportLize.Talk.Api.Talk.Repository
             return userKafka;
         }
 
-        public async Task<Chat> InsertChat(ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default)
+        public async Task<Chat> InsertChatForSender(int userId, ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default)
         {
             var chat = _mapper.Map<Chat>(chatWriteDto);
-            await _talkDbContext.Chat.AddAsync(chat);
+
+            var user = await GetUser(userId, cancellationToken);
+            if (user is not null)
+            {
+                chat.SenderId = user.Id;
+                chat.Sender = user;
+                user.SentChats.Add(chat);
+            }
+
             return chat;
         }
 
-        public async Task<Message> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
+        public async Task<Chat> InsertChatForReceiver(int userId, ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default)
+        {
+            var chat = _mapper.Map<Chat>(chatWriteDto);
+
+            var user = await GetUser(userId, cancellationToken);
+            if(user is not null)
+            {
+                chat.ReceiverId = user.Id;
+                chat.Receiver = user;
+                user.ReceivedChats.Add(chat);
+            }
+
+            return chat;
+        }
+
+        public async Task<Message> InsertMessageInChat(int chatId, MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
         {
             var message = _mapper.Map<Message>(messageWriteDto);
-            await _talkDbContext.Message.AddAsync(message);
+
+            var chat = await GetChat(chatId, cancellationToken);
+            if (chat is not null)
+            {
+                message.ChatId = chat.Id;
+                message.Chat = chat;
+                chat.Messages.Add(message);
+            }
+
             return message;
         }
         #endregion
 
         #region UPDATE
-        public async Task<UserKafka> UpdateUserKafka(UserKafka oldUserKafka, UserKafka newUserKafka, CancellationToken cancellationToken = default)
+        public async Task<UserKafka> UpdateUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
         {
-            var user = await _talkDbContext.UserKafka.FirstOrDefaultAsync(s => s.Id == oldUserKafka.Id, cancellationToken);
-
-            if (user is not null)
-                await DeleteUserKafka(oldUserKafka, cancellationToken);
-
-            await _talkDbContext.UserKafka.AddAsync(newUserKafka, cancellationToken);
-            return newUserKafka;
+            _talkDbContext.UserKafka.Update(userKafka);
+            return userKafka;
         }
 
-        public async Task<Chat> UpdateChat(ChatReadDto oldChatDto, ChatWriteDto newChatDto, CancellationToken cancellationToken = default)
+        public async Task<Chat> UpdateChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default)
         {
-            var chat = await _talkDbContext.Chat.FirstOrDefaultAsync(s => s.Id == oldChatDto.Id, cancellationToken);
-
-            if (chat is not null)
-                await DeleteChat(oldChatDto, cancellationToken);
-
-            var newChat = _mapper.Map<Chat>(newChatDto);
-            await _talkDbContext.Chat.AddAsync(newChat, cancellationToken);
-            return newChat;
+            var chat = _mapper.Map<Chat>(chatReadDto);
+            _talkDbContext.Chat.Update(chat);
+            return chat;
         }
 
-        public async Task<Message> UpdateMessage(MessageReadDto oldMessageDto, MessageWriteDto newMessageDto, CancellationToken cancellationToken = default)
+        public async Task<Message> UpdateMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default)
         {
-            var message = await _talkDbContext.UserKafka.FirstOrDefaultAsync(s => s.Id == oldMessageDto.Id, cancellationToken);
-
-            if (message is not null)
-                await DeleteMessage(oldMessageDto, cancellationToken);
-
-            var newMessage = _mapper.Map<Message>(newMessageDto);
-            await _talkDbContext.Message.AddAsync(newMessage, cancellationToken);
-            return newMessage;
+            var message = _mapper.Map<Message>(messageReadDto);
+            _talkDbContext.Message.Update(message);
+            return message;
         }
         #endregion
 
         #region GET
         public async Task<List<UserKafka>?> GetAllUsers(CancellationToken cancellationToken = default) => await _talkDbContext.UserKafka.ToListAsync(cancellationToken);
 
-        public async Task<List<Chat>?> GetAllChatOfUser(UserKafka userKafka, CancellationToken cancellationToken = default)
+        public async Task<List<Chat>?> GetAllSentChatOfUser(int userId, CancellationToken cancellationToken = default)
         {
-            var user = await GetUser(userKafka.Id, cancellationToken);
-            if (user is null)
-                return null;
-            return user.Chats;
+            var user = await _talkDbContext.UserKafka.Include(u => u.ReceivedChats).FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            return user?.SentChats;
+        }
+        public async Task<List<Chat>?> GetAllReceivedChatOfUser(int userId, CancellationToken cancellationToken = default)
+        {
+            var user = await _talkDbContext.UserKafka.Include(u => u.ReceivedChats).FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            return user?.ReceivedChats;
         }
 
-        public async Task<List<Message>?> GetAllMessagesOfChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default)
+        public async Task<List<Message>?> GetAllMessagesOfChat(int chatId, CancellationToken cancellationToken = default)
         {
-            var chat = await GetChat(chatReadDto.Id, cancellationToken);
-            if (chat is null)
-                return null;
-            return chat.Messages;
+            var chat = await _talkDbContext.Chat.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == chatId, cancellationToken);
+            return chat?.Messages;
         }
 
         public async Task<UserKafka?> GetUser(int id, CancellationToken cancellationToken = default) => 

@@ -1,6 +1,26 @@
 version: '3.4'
 
 services:
+  #SQL SERVER    
+  mssql-server:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      TZ: Europe/Rome
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: p4ssw0rD
+    ports:
+      - 2433:1433
+    volumes:
+      - "mssql-server:/var/opt/mssql"
+  adminer:
+    image: adminer:4.8.1
+    ports:
+      - 2431:8080
+    environment:
+      TZ: Europe/Rome
+      ADMINER_DEFAULT_SERVER: mssql-server 
+      
   #ZOOKEEPER
   zookeeper:
     container_name: zookeeper
@@ -23,41 +43,23 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-
-
-  # POSTGRES FOR PROFILE
-  sportlize.pgsql.profile:
-    image: postgres:latest
-    container_name: db-sportlize-pgsql-profile
-    environment:
-      POSTGRES_DB: SportLizeProfile
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 8002:5432
+    depends_on:
+      - zookeeper
 
   # PROFILE
   sportlize.profile.api:
     container_name: api-sportlize-profile
     image: ${DOCKER_REGISTRY-}sportlizeprofile
     build:
-      context: .
-      dockerfile: src/SportLize.Profile.Api/Dockerfile
+        context: .
+        dockerfile: src/SportLize.Profile.Api/Dockerfile
+    depends_on:
+        - kafka
+        - mssql-server
     environment:
-      - DB_HOST=sportlize.pgsql.profile
-      - DB_NAME=SportLizeProfile
-      - DB_SA_PASSWORD=postgres
-
-  # POSTGRES FOR TALK
-  sportlize.pgsql.talk:
-    image: postgres:latest
-    container_name: db-sportlize-pgsql-talk
-    environment:
-      POSTGRES_DB: SportLizeTalk
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 8003:5432
+      TZ: Europe/Rome
+    volumes:
+      - "./config/sportlize-profile-appsettings.json:/app/appsettings.json:ro"
 
   # TALK
   sportlize.talk.api:
@@ -66,21 +68,13 @@ services:
     build:
         context: .
         dockerfile: src/SportLize.Talk.Api/Dockerfile
+    depends_on:
+        - kafka
+        - mssql-server
     environment:
-      - DB_HOST=sportlize.pgsql.talk
-      - DB_NAME=SportLizeTalk
-      - DB_SA_PASSWORD=postgres
-      
-  # POSTGRES FOR TEAM
-  sportlize.pgsql.team:
-    image: postgres:latest
-    container_name: db-sportlize-pgsql-team
-    environment:
-      POSTGRES_DB: SportLizeTeam
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 8004:5432
+      TZ: Europe/Rome
+    volumes:
+      - "./config/sportlize-talk-appsettings.json:/app/appsettings.json:ro"
 
   # TEAM
   sportlize.team.api:
@@ -89,10 +83,13 @@ services:
     build:
         context: .
         dockerfile: src/SportLize.Team.Api/Dockerfile
+    depends_on:
+        - kafka
+        - mssql-server
     environment:
-      - DB_HOST=sportlize.pgsql.team
-      - DB_NAME=SportLizeTeam
-      - DB_SA_PASSWORD=postgres
+      TZ: Europe/Rome
+    volumes:
+      - "./config/sportlize-team-appsettings.json:/app/appsettings.json:ro"
 
   # FRONTEND
   sportlize.front.razor:
@@ -100,3 +97,6 @@ services:
     build:
       context: .
       dockerfile: src/SportLize.Front.Razor/Dockerfile
+
+volumes:
+  mssql-server:

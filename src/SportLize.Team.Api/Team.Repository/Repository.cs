@@ -14,6 +14,7 @@ public class Repository : IRepository
     {
         _mapper = mapper;
         _teamDbContext = teamDbContext;
+        _teamDbContext.Database.Migrate();
     }
 
     public async Task<int> SaveChanges(CancellationToken cancellationToken = default) => await _teamDbContext.SaveChangesAsync(cancellationToken);
@@ -29,6 +30,7 @@ public class Repository : IRepository
     public async Task<Message> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
     {
         var message = _mapper.Map<Message>(messageWriteDto);
+
         await _teamDbContext.Message.AddAsync(message);
         return message;
     }

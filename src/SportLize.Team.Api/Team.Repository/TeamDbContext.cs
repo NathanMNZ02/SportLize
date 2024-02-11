@@ -9,21 +9,6 @@ namespace SportLize.Team.Api.Team.Repository
     {
         public TeamDbContext(DbContextOptions<TeamDbContext> options) : base(options)
         {
-            try
-            {
-                if (Database.GetService<IDatabaseCreator>() is RelationalDatabaseCreator databaseCreator)
-                {
-                    if (!databaseCreator.CanConnect())
-                        databaseCreator.Create();
-
-                    if (!databaseCreator.HasTables())
-                        databaseCreator.CreateTables();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
