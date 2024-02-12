@@ -18,16 +18,10 @@ namespace SportLize.Talk.Api.Controller
             _logger = logger;
         }
 
-        [HttpPost(Name = "InsertChatForSender")]
-        public async Task<ActionResult> InsertChatForSender([FromQuery] int userId, [FromBody] ChatWriteDto chatWriteDto)
+        [HttpPost(Name = "InsertChat")]
+        public async Task<ActionResult> InsertChat(int senderId, int receiverId)
         {
-            return Ok(await _business.InsertChatForSender(userId, chatWriteDto));
-        }
-
-        [HttpPost(Name = "InsertChatForReceiver")]
-        public async Task<ActionResult> InsertChatForReceiver([FromQuery]  int userId, [FromBody] ChatWriteDto chatWriteDto)
-        {
-            return Ok(await _business.InsertChatForReceiver(userId, chatWriteDto));
+            return Ok(await _business.InsertChat(senderId, receiverId));
         }
 
         [HttpPut(Name = "UpdateChat")]

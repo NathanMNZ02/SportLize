@@ -27,11 +27,24 @@ public class Repository : IRepository
         return group;
     }
 
-    public async Task<Message> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
+    public async Task<UserKafka> InsertUserToGroup(int groupId, UserKafka userKafka, CancellationToken cancellationToken = default)
+    {
+        var group = await GetGroup(groupId, cancellationToken);
+
+        if(group is not null)
+            group.UsersKafka.Add(userKafka);
+
+        return userKafka;
+    }
+
+    public async Task<Message> InsertMessageToGroup(int groupId, MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
     {
         var message = _mapper.Map<Message>(messageWriteDto);
+        var group = await GetGroup(groupId, cancellationToken);
 
-        await _teamDbContext.Message.AddAsync(message);
+        if(group is not null)
+            group.Messages.Add(message);
+
         return message;
     }
 
@@ -43,39 +56,25 @@ public class Repository : IRepository
     #endregion
 
     #region UPDATE
-    public async Task<Group> UpdateGroup(GroupReadDto oldGroupDto, GroupWriteDto newGroupDto, CancellationToken cancellationToken = default)
+    public async Task<Group> UpdateGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default)
     {
-        var group = await _teamDbContext.Group.FirstOrDefaultAsync(s => s.Id == oldGroupDto.Id, cancellationToken);
-
-        if (group is not null)
-            await DeleteGroup(oldGroupDto, cancellationToken);
-
-        var newGroup = _mapper.Map<Group>(newGroupDto);
-        await _teamDbContext.Group.AddAsync(newGroup, cancellationToken);
-        return newGroup;
+        var group = _mapper.Map<Group>(groupReadDto);
+        _teamDbContext.Group.Update(group);
+        return group;
     }
 
-    public async Task<Message> UpdateMessage(MessageReadDto oldMessageDto, MessageWriteDto newMessageDto, CancellationToken cancellationToken = default)
+    public async Task<Message> UpdateMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default)
     {
-        var message = await _teamDbContext.UserKafka.FirstOrDefaultAsync(s => s.Id == oldMessageDto.Id, cancellationToken);
-
-        if (message is not null)
-            await DeleteMessage(oldMessageDto, cancellationToken);
-
-        var newMessage = _mapper.Map<Message>(newMessageDto);
-        await _teamDbContext.Message.AddAsync(newMessage, cancellationToken);
-        return newMessage;
+        var message = _mapper.Map<Message>(messageReadDto);
+        _teamDbContext.Message.Update(message);
+        return message;
     }
 
-    public async Task<UserKafka> UpdateUserKafka(UserKafka oldUserKafka, UserKafka newUserKafka, CancellationToken cancellationToken = default)
+    public async Task<UserKafka> UpdateUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
     {
-        var user = await _teamDbContext.UserKafka.FirstOrDefaultAsync(s => s.Id == oldUserKafka.Id, cancellationToken);
-
-        if (user is not null)
-            await DeleteUserKafka(oldUserKafka, cancellationToken);
-
-        await _teamDbContext.UserKafka.AddAsync(newUserKafka, cancellationToken);
-        return newUserKafka;
+        var user = userKafka;
+        _teamDbContext.UserKafka.Update(userKafka);
+        return user;
     }
     #endregion
 
@@ -83,22 +82,17 @@ public class Repository : IRepository
     #region GET
     public async Task<List<Group>?> GetAllGroup(CancellationToken cancellationToken = default) => await _teamDbContext.Group.ToListAsync();
 
-    public async Task<List<Message>?> GetAllMessagesOfGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default)
-    {
-        var group = await GetGroup(groupReadDto.Id, cancellationToken);
-        if(group is null)
-            return null;
+    public async Task<List<UserKafka>?> GetAllUserKafka(CancellationToken cancellationToken = default) => await _teamDbContext.UserKafka.ToListAsync();
 
-        return group.Messages;
+    public async Task<List<UserKafka>?> GetAllUserKafkaOfGroup(int groupId, CancellationToken cancellationToken = default)
+    {
+        var group = await _teamDbContext.Group.Include(s => s.Id == groupId).FirstOrDefaultAsync(cancellationToken);
+        return group?.UsersKafka;
     }
-
-    public async Task<List<UserKafka>?> GetAllUserKafkaOfGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default)
+    public async Task<List<Message>?> GetAllMessagesOfGroup(int groupId, CancellationToken cancellationToken = default)
     {
-        var group = await GetGroup(groupReadDto.Id, cancellationToken);
-        if (group is null)
-            return null;
-
-        return group.UsersKafka;
+        var group = await _teamDbContext.Group.Include(s => s.Id == groupId).FirstOrDefaultAsync(cancellationToken);
+        return group?.Messages;
     }
 
     public async Task<Group?> GetGroup(int id, CancellationToken cancellationToken = default) =>

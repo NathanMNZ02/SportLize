@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using SportLize.Profile.Api.Profile.ClientHttp.Abstraction;
 using SportLize.Talk.Api.Talk.Business.Abstraction;
 using SportLize.Talk.Api.Talk.Repository.Abstraction;
 using SportLize.Talk.Api.Talk.Repository.Model;
@@ -9,35 +10,29 @@ namespace SportLize.Talk.Api.Talk.Business
 {
     public class Business : IBusiness
     {
+        private readonly IClientHttp _clientHttp;
         private readonly IMapper _mapper;
         private readonly IRepository _repository;
 
-        public Business(IMapper mapper, IRepository repository)
+        public Business(IMapper mapper, IClientHttp clientHttp, IRepository repository)
         {
             _mapper = mapper;
             _repository = repository;
+            _clientHttp = clientHttp;
         }
 
         #region INSERT
-        public async Task<UserKafka> InsertUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
+        public async Task<ChatReadDto?> InsertChat(int senderId, int receiverId, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<UserKafka>(await _repository.InsertUserKafka(userKafka, cancellationToken));
-            await _repository.SaveChanges(cancellationToken);
-            return result;
-        }
-
-        public async Task<ChatReadDto> InsertChatForSender(int userId, ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default)
-        {
-            var result = _mapper.Map<ChatReadDto>(await _repository.InsertChatForSender(userId, chatWriteDto, cancellationToken));
-            await _repository.SaveChanges(cancellationToken);
-            return result;
-        }
-
-        public async Task<ChatReadDto> InsertChatForReceiver(int userId, ChatWriteDto chatWriteDto, CancellationToken cancellationToken = default)
-        {
-            var result = _mapper.Map<ChatReadDto>(await _repository.InsertChatForReceiver(userId, chatWriteDto, cancellationToken));
-            await _repository.SaveChanges(cancellationToken);
-            return result;
+            var sender = await _clientHttp.GetUser(senderId, cancellationToken);
+            var receiver = await _clientHttp.GetUser(receiverId, cancellationToken);
+            if (sender is not null && receiver is not null)
+            {
+                var result = _mapper.Map<ChatReadDto>(await _repository.InsertChat(new ChatWriteDto() { SenderId = senderId, ReceiverId = receiverId }, cancellationToken));
+                await _repository.SaveChanges(cancellationToken);
+                return result;
+            }
+            return null;
         }
 
         public async Task<MessageReadDto> InsertMessageInChat(int chatId, MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
@@ -49,12 +44,6 @@ namespace SportLize.Talk.Api.Talk.Business
         #endregion
 
         #region UPDATE
-        public async Task<UserKafka> UpdateUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
-        {
-            var result = await _repository.UpdateUserKafka(userKafka, cancellationToken);
-            await _repository.SaveChanges(cancellationToken);
-            return result;
-        }
         public async Task<ChatReadDto> UpdateChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default)
         {
             var result = _mapper.Map<ChatReadDto>(await _repository.UpdateChat(chatReadDto, cancellationToken));
@@ -71,9 +60,6 @@ namespace SportLize.Talk.Api.Talk.Business
         #endregion
 
         #region GET
-        public async Task<List<UserKafka>?> GetAllUsers(CancellationToken cancellationToken = default) =>
-            await _repository.GetAllUsers(cancellationToken);
-
         public async Task<List<ChatReadDto>?> GetAllSentChatOfUser(int userId, CancellationToken cancellationToken = default) =>
             _mapper.Map<List<ChatReadDto>?>(await _repository.GetAllSentChatOfUser(userId, cancellationToken));
 
@@ -83,9 +69,6 @@ namespace SportLize.Talk.Api.Talk.Business
         public async Task<List<MessageReadDto>?> GetAllMessagesOfChat(int chatId, CancellationToken cancellationToken = default) =>
             _mapper.Map<List<MessageReadDto>?>(await _repository.GetAllMessagesOfChat(chatId, cancellationToken));
 
-        public async Task<UserKafka?> GetUser(int id, CancellationToken cancellationToken = default) =>
-            await _repository.GetUser(id, cancellationToken);
-
         public async Task<ChatReadDto?> GetChat(int id, CancellationToken cancellationToken = default) =>
             _mapper.Map<ChatReadDto?>(await _repository.GetChat(id, cancellationToken));
 
@@ -94,13 +77,6 @@ namespace SportLize.Talk.Api.Talk.Business
         #endregion
 
         #region REMOVE
-        public async Task<UserKafka> DeleteUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
-        {
-            var result = await _repository.DeleteUserKafka(userKafka, cancellationToken);
-            await _repository.SaveChanges(cancellationToken);
-            return result;
-        }
-
         public async Task<ChatReadDto> DeleteChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default) {
             var result = _mapper.Map<ChatReadDto>(await _repository.DeleteChat(chatReadDto, cancellationToken));
             await _repository.SaveChanges(cancellationToken);

@@ -12,10 +12,5 @@ namespace SportLize.Team.Api.Team.Repository.Model
         public string Password { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime DateOfBorn { get; set; } = DateTime.UtcNow;
-
-
-        //Navigation
-        public int GroupId { get; set; }
-        public Group? Group { get; set; }
     }
 }

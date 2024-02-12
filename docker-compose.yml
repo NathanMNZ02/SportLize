@@ -46,7 +46,6 @@ services:
     depends_on:
       - zookeeper
 
-  # PROFILE
   sportlize.profile.api:
     container_name: api-sportlize-profile
     image: ${DOCKER_REGISTRY-}sportlizeprofile
@@ -54,8 +53,8 @@ services:
         context: .
         dockerfile: src/SportLize.Profile.Api/Dockerfile
     depends_on:
-        - kafka
-        - mssql-server
+      - kafka
+      - mssql-server
     environment:
       TZ: Europe/Rome
     volumes:
@@ -69,8 +68,7 @@ services:
         context: .
         dockerfile: src/SportLize.Talk.Api/Dockerfile
     depends_on:
-        - kafka
-        - mssql-server
+      - mssql-server
     environment:
       TZ: Europe/Rome
     volumes:
@@ -84,10 +82,10 @@ services:
         context: .
         dockerfile: src/SportLize.Team.Api/Dockerfile
     depends_on:
-        - kafka
-        - mssql-server
+      - kafka
+      - mssql-server
     environment:
-      TZ: Europe/Rome
+      TZ: Europe/Rome 
     volumes:
       - "./config/sportlize-team-appsettings.json:/app/appsettings.json:ro"
 
@@ -97,6 +95,6 @@ services:
     build:
       context: .
       dockerfile: src/SportLize.Front.Razor/Dockerfile
-
+          
 volumes:
   mssql-server:

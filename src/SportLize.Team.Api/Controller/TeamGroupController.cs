@@ -24,9 +24,9 @@ namespace SportLize.Team.Api.Controller
         }
 
         [HttpPut(Name = "UpdateGroup")]
-        public async Task<ActionResult> UpdateGroup([FromBody] GroupReadDto oldGroup, [FromQuery] GroupWriteDto newGroup)
+        public async Task<ActionResult> UpdateGroup([FromBody] GroupReadDto groupReadDto)
         {
-            return Ok(await _business.UpdateGroup(oldGroup, newGroup));
+            return Ok(await _business.UpdateGroup(groupReadDto));
         }
 
         [HttpGet(Name = "GetAllGroup")]

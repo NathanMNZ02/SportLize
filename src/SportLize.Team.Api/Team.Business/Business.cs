@@ -16,6 +16,7 @@ namespace SportLize.Team.Api.Team.Business
             _mapper = mapper;
             _repository = repository;
         }
+
         #region INSERT
         public async Task<GroupReadDto> InsertGroup(GroupWriteDto groupWriteDto, CancellationToken cancellationToken = default)
         {
@@ -24,9 +25,16 @@ namespace SportLize.Team.Api.Team.Business
             return result;
         }
 
-        public async Task<MessageReadDto> InsertMessage(MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
+        public async Task<UserKafka> InsertUserToGroup(int groupId, UserKafka userKafka, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<MessageReadDto>(await _repository.InsertMessage(messageWriteDto, cancellationToken));
+            var result = await _repository.InsertUserToGroup(groupId, userKafka, cancellationToken);
+            await _repository.SaveChanges(cancellationToken);
+            return result;
+        }
+
+        public async Task<MessageReadDto> InsertMessageToGroup(int groupId, MessageWriteDto messageWriteDto, CancellationToken cancellationToken = default)
+        {
+            var result = _mapper.Map<MessageReadDto>(await _repository.InsertMessageToGroup(groupId, messageWriteDto, cancellationToken));
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
@@ -40,23 +48,23 @@ namespace SportLize.Team.Api.Team.Business
         #endregion
 
         #region UPDATE
-        public async Task<GroupReadDto> UpdateGroup(GroupReadDto oldGroupReadDto, GroupWriteDto newGroupWriteDto, CancellationToken cancellationToken = default)
+        public async Task<GroupReadDto> UpdateGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<GroupReadDto>(await _repository.UpdateGroup(oldGroupReadDto, newGroupWriteDto, cancellationToken));
+            var result = _mapper.Map<GroupReadDto>(await _repository.UpdateGroup(groupReadDto, cancellationToken));
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
 
-        public async Task<MessageReadDto> UpdateMessage(MessageReadDto oldMessageReadDto, MessageWriteDto newMessageWriteDto, CancellationToken cancellationToken = default)
+        public async Task<MessageReadDto> UpdateMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<MessageReadDto>(await _repository.UpdateMessage(oldMessageReadDto, newMessageWriteDto, cancellationToken));
+            var result = _mapper.Map<MessageReadDto>(await _repository.UpdateMessage(messageReadDto, cancellationToken));
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
 
-        public async Task<UserKafka> UpdateUserKafka(UserKafka oldUserKafka, UserKafka newUserKafka, CancellationToken cancellationToken = default)
+        public async Task<UserKafka> UpdateUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
         {
-            var result = await _repository.UpdateUserKafka(oldUserKafka, newUserKafka, cancellationToken);
+            var result = await _repository.UpdateUserKafka(userKafka, cancellationToken);
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
@@ -66,11 +74,14 @@ namespace SportLize.Team.Api.Team.Business
         public async Task<List<GroupReadDto>?> GetAllGroup(CancellationToken cancellationToken = default) =>
             _mapper.Map<List<GroupReadDto>?>(await _repository.GetAllGroup(cancellationToken));
 
-        public async Task<List<MessageReadDto>?> GetAllMessagesOfGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default) =>
-            _mapper.Map<List<MessageReadDto>?>(await _repository.GetAllMessagesOfGroup(groupReadDto, cancellationToken));
+        public async Task<List<UserKafka>?> GetAllUserKafka(CancellationToken cancellationToken = default) =>
+            await _repository.GetAllUserKafka(cancellationToken);
 
-        public async Task<List<UserKafka>?> GetAllUserKafkaOfGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default) =>
-            await _repository.GetAllUserKafkaOfGroup(groupReadDto, cancellationToken);
+        public async Task<List<MessageReadDto>?> GetAllMessagesOfGroup(int groupId, CancellationToken cancellationToken = default) =>
+            _mapper.Map<List<MessageReadDto>?>(await _repository.GetAllMessagesOfGroup(groupId, cancellationToken));
+
+        public async Task<List<UserKafka>?> GetAllUserKafkaOfGroup(int groupId, CancellationToken cancellationToken = default) =>
+            await _repository.GetAllUserKafkaOfGroup(groupId, cancellationToken);
 
         public async Task<GroupReadDto?> GetGroup(int id, CancellationToken cancellationToken = default) =>
             _mapper.Map<GroupReadDto?>(await _repository.GetGroup(id, cancellationToken));

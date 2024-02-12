@@ -8,16 +8,7 @@
   "ConnectionStrings": {
     "TalkDbContext": "Server=host.docker.internal,2433;Database=SportLizeTalk;User Id=sa;Password=p4ssw0rD;Encrypt=False"
   },
-   "Kafka": {
-    "ConsumerClient": {
-      "BootstrapServers": "host.docker.internal:9092",
-      "GroupId": "UserTake"
-    },
-    "AdminClient": {
-      "BootstrapServers": "host.docker.internal:9092"
-    },
-    "Topics": {
-      "User": "User"
-    }
+  "ProfileClientHttp": {
+    "BaseAddress": "https://api-sportlize-profile:56873/"
   }
 }

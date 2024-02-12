@@ -18,16 +18,16 @@ namespace SportLize.Profile.Api.Profile.ClientHttp
 		}
 
         public async Task<List<UserReadDto>?> GetAllUsers(CancellationToken cancellationToken = default){
-            var response = await _httpClient.GetAsync($"/Profile/GetAllUsers", cancellationToken);
+            var response = await _httpClient.GetAsync($"ProfileUser/GetAllUsers", cancellationToken);
             return await response.EnsureSuccessStatusCode().Content.ReadFromJsonAsync<List<UserReadDto>?>(cancellationToken: cancellationToken);
         }
 
         public async Task<UserReadDto?> GetUser(int userId, CancellationToken cancellationToken = default)
         {
             var queryString = QueryString.Create(new Dictionary<string, string?>() {
-                { "userId", userId.ToString(CultureInfo.InvariantCulture) }
+                { "id", userId.ToString(CultureInfo.InvariantCulture) }
             });
-            var response = await _httpClient.GetAsync($"/Profile/GetUser{queryString}", cancellationToken);
+            var response = await _httpClient.GetAsync($"ProfileUser/GetUser{queryString}", cancellationToken);
             return await response.EnsureSuccessStatusCode().Content.ReadFromJsonAsync<UserReadDto?>(cancellationToken: cancellationToken);
         }
     }

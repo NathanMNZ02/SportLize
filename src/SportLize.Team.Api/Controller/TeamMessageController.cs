@@ -18,21 +18,21 @@ namespace SportLize.Team.Api.Controller
         }
 
         [HttpPost(Name = "InsertMessage")]
-        public async Task<ActionResult> InsertMessage(MessageWriteDto messageWriteDto)
+        public async Task<ActionResult> InsertMessageToGroup([FromQuery] int groupId, MessageWriteDto messageWriteDto)
         {
-            return Ok(await _business.InsertMessage(messageWriteDto));
+            return Ok(await _business.InsertMessageToGroup(groupId, messageWriteDto));
         }
 
         [HttpPut(Name = "UpdateMessage")]
-        public async Task<ActionResult> UpdateMessage([FromBody] MessageReadDto oldMessage, [FromQuery] MessageWriteDto newMessage)
+        public async Task<ActionResult> UpdateMessage([FromBody] MessageReadDto messageReadDto)
         {
-            return Ok(await _business.UpdateMessage(oldMessage, newMessage));
+            return Ok(await _business.UpdateMessage(messageReadDto));
         }
 
-        [HttpGet(Name = "GetAllMessage")]
-        public async Task<ActionResult> GetAllMessage(GroupReadDto groupReadDto)
+        [HttpGet(Name = "GetAllMessagesOfGroup")]
+        public async Task<ActionResult> GetAllMessagesOfGroup(int groupId)
         {
-            return Ok(await _business.GetAllMessagesOfGroup(groupReadDto));
+            return Ok(await _business.GetAllMessagesOfGroup(groupId));
         }
 
         [HttpGet(Name = "GetMessage")]

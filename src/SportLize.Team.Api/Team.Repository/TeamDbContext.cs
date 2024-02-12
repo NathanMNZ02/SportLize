@@ -28,7 +28,6 @@ namespace SportLize.Team.Api.Team.Repository
             modelBuilder.Entity<UserKafka>().Property(s => s.Id).ValueGeneratedOnAdd();
             modelBuilder.Entity<TransactionalOutbox>().Property(s => s.Id).ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<Group>().HasMany(s => s.UsersKafka).WithOne(s => s.Group).HasForeignKey(s => s.GroupId).IsRequired();
             modelBuilder.Entity<Group>().HasMany(s => s.Messages).WithOne(s => s.Group).HasForeignKey(s => s.GroupId).IsRequired();
 
             base.OnModelCreating(modelBuilder);
