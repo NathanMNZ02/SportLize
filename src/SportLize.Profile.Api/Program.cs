@@ -9,10 +9,6 @@ using SportLize.Profile.Api.Profile.Business.Kafka;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string? dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-string? dbName = Environment.GetEnvironmentVariable("DB_NAME");
-string? dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
-
 builder.Services.AddDbContext<ProfileDbContext>(options => options.UseSqlServer("name=ConnectionStrings:ProfileDbContext",
     b => b.MigrationsAssembly("SportLize.Profile.Api")));
 

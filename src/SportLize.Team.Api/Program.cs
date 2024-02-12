@@ -13,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TeamDbContext>(options => options.UseSqlServer("name=ConnectionStrings:TeamDbContext",
     b => b.MigrationsAssembly("SportLize.Team.Api")));
 
-
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IRepository, Repository>();
