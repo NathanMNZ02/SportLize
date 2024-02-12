@@ -13,9 +13,11 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportLize.Front.Razor", "src\SportLize.Front.Razor\SportLize.Front.Razor.csproj", "{EEE372D0-99C7-45C3-A47F-C18E1798C104}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Talk.Api", "src\SportLize.Talk.Api\SportLize.Talk.Api.csproj", "{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportLize.Talk.Api", "src\SportLize.Talk.Api\SportLize.Talk.Api.csproj", "{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLize.Team.Api", "src\SportLize.Team.Api\SportLize.Team.Api.csproj", "{2833FAE0-502D-462D-9750-F1097BF0F954}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportLize.Team.Api", "src\SportLize.Team.Api\SportLize.Team.Api.csproj", "{2833FAE0-502D-462D-9750-F1097BF0F954}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportLizeFrontMvc", "..\SportLizeFrontMvc\SportLizeFrontMvc.csproj", "{8D988224-57DC-4E84-B10C-F3A72CCF4672}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{2833FAE0-502D-462D-9750-F1097BF0F954}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2833FAE0-502D-462D-9750-F1097BF0F954}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2833FAE0-502D-462D-9750-F1097BF0F954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D988224-57DC-4E84-B10C-F3A72CCF4672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D988224-57DC-4E84-B10C-F3A72CCF4672}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D988224-57DC-4E84-B10C-F3A72CCF4672}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D988224-57DC-4E84-B10C-F3A72CCF4672}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,5 +63,6 @@ Global
 		{EEE372D0-99C7-45C3-A47F-C18E1798C104} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
 		{7F14E17B-DC49-4A19-9AB5-CAF677D3FA37} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
 		{2833FAE0-502D-462D-9750-F1097BF0F954} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
+		{8D988224-57DC-4E84-B10C-F3A72CCF4672} = {A5555984-FAFC-4CA1-AA0B-79A71F015206}
 	EndGlobalSection
 EndGlobal

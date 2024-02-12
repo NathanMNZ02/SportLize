@@ -58,23 +58,43 @@ public class Repository : IRepository
     #region UPDATE
     public async Task<Group> UpdateGroup(GroupReadDto groupReadDto, CancellationToken cancellationToken = default)
     {
-        var group = _mapper.Map<Group>(groupReadDto);
-        _teamDbContext.Group.Update(group);
-        return group;
+        var newGroup = _mapper.Map<Group>(groupReadDto);
+        var oldGroup = await _teamDbContext.Group.Include(s => s.UsersKafka).Include(s => s.Messages).FirstOrDefaultAsync(s => s.Id == newGroup.Id);
+        if(oldGroup is not null)
+        {
+            oldGroup.Name = newGroup.Name;
+            oldGroup.GroupState = newGroup.GroupState;
+        }
+        return newGroup;
     }
 
     public async Task<Message> UpdateMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default)
     {
-        var message = _mapper.Map<Message>(messageReadDto);
-        _teamDbContext.Message.Update(message);
-        return message;
+        var newMessage = _mapper.Map<Message>(messageReadDto);
+        var oldMessage = await _teamDbContext.Message.FirstOrDefaultAsync(m => m.Id == newMessage.Id, cancellationToken);
+        if (oldMessage is not null)
+        {
+            oldMessage.Text = newMessage.Text;
+            oldMessage.DateTime = newMessage.DateTime;
+        }
+        return newMessage;
     }
 
     public async Task<UserKafka> UpdateUserKafka(UserKafka userKafka, CancellationToken cancellationToken = default)
     {
-        var user = userKafka;
-        _teamDbContext.UserKafka.Update(userKafka);
-        return user;
+        var newUserKafka = _mapper.Map<UserKafka>(userKafka);
+        var oldUserKafka = await _teamDbContext.UserKafka.FirstOrDefaultAsync(u => u.Id == newUserKafka.Id, cancellationToken);
+        if (oldUserKafka is not null)
+        {
+            oldUserKafka.Actor = newUserKafka.Actor;
+            oldUserKafka.Nickname = newUserKafka.Nickname;
+            oldUserKafka.Name = newUserKafka.Name;
+            oldUserKafka.Surname = newUserKafka.Surname;
+            oldUserKafka.Password = newUserKafka.Password;
+            oldUserKafka.Description = newUserKafka.Description;
+            oldUserKafka.DateOfBorn = newUserKafka.DateOfBorn;
+        }
+        return newUserKafka;
     }
     #endregion
 

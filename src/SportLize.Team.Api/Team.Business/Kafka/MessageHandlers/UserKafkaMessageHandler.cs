@@ -14,14 +14,14 @@ namespace SportLize.Team.Api.Team.Business.Kafka.MessageHandlers
             await Repository.InsertUserKafka(domainDto, cancellationToken);
         }
 
-        protected override Task UpdateDtoAsync(UserKafka domainDto, CancellationToken cancellationToken = default)
+        protected override async Task UpdateDtoAsync(UserKafka domainDto, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await Repository.UpdateUserKafka(domainDto, cancellationToken);
         }
 
         protected override async Task DeleteDtoAsync(UserKafka domainDto, CancellationToken cancellationToken = default)
         {
-            await Repository.DeleteUserKafka(domainDto);
+            await Repository.DeleteUserKafka(domainDto, cancellationToken);
         }
     }
 }

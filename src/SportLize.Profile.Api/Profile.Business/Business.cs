@@ -69,21 +69,24 @@ namespace SportLize.Profile.Api.Profile.Business
         #region UPDATE
         public async Task<UserReadDto> UpdateUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<UserReadDto>(_repository.UpdateUser(userReadDto, cancellationToken));
+            var result = _mapper.Map<UserReadDto>(await _repository.UpdateUser(userReadDto, cancellationToken));
+            await _repository.SaveChanges(cancellationToken);
+
+            await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateUpdate(result), cancellationToken);
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
 
         public async Task<PostReadDto> UpdatePost(PostReadDto postReadDto, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<PostReadDto>(_repository.UpdatePost(postReadDto, cancellationToken));
+            var result = _mapper.Map<PostReadDto>(await _repository.UpdatePost(postReadDto, cancellationToken));
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
 
         public async Task<CommentReadDto> UpdateComment(CommentReadDto commentReadDto, CancellationToken cancellationToken = default)
         {
-            var result = _mapper.Map<CommentReadDto>(_repository.UpdateComment(commentReadDto, cancellationToken));
+            var result = _mapper.Map<CommentReadDto>(await _repository.UpdateComment(commentReadDto, cancellationToken));
             await _repository.SaveChanges(cancellationToken);
             return result;
         }
@@ -164,6 +167,9 @@ namespace SportLize.Profile.Api.Profile.Business
         public async Task<UserReadDto> DeleteUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
             var result = _mapper.Map<UserReadDto>(await _repository.DeleteUser(userReadDto, cancellationToken));
+            await _repository.SaveChanges(cancellationToken);
+
+            await _repository.InsertTransactionalOutbox(TransactionalOutboxFactory.CreateDelete(result), cancellationToken);
             await _repository.SaveChanges(cancellationToken);
             return result;
         }

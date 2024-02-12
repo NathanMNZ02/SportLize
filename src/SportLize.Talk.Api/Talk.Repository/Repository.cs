@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SportLize.Profile.Api.Profile.Repository;
 using SportLize.Talk.Api.Talk.Repository.Abstraction;
 using SportLize.Talk.Api.Talk.Repository.Model;
 using SportLize.Talk.Api.Talk.Shared.Dto;
@@ -47,18 +48,27 @@ namespace SportLize.Talk.Api.Talk.Repository
         #endregion
 
         #region UPDATE
-        public async Task<Chat> UpdateChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default)
-        {
-            var chat = _mapper.Map<Chat>(chatReadDto);
-            _talkDbContext.Chat.Update(chat);
-            return chat;
-        }
-
         public async Task<Message> UpdateMessage(MessageReadDto messageReadDto, CancellationToken cancellationToken = default)
         {
-            var message = _mapper.Map<Message>(messageReadDto);
-            _talkDbContext.Message.Update(message);
-            return message;
+            var newMessage = _mapper.Map<Message>(messageReadDto);
+            var oldMessage = await _talkDbContext.Message.FirstOrDefaultAsync(m => m.Id == newMessage.Id, cancellationToken);
+            if (oldMessage is not null)
+            {
+                oldMessage.Text = newMessage.Text;
+            }
+            return newMessage;
+        }
+
+        public async Task<Chat> UpdateChat(ChatReadDto chatReadDto, CancellationToken cancellationToken = default)
+        {
+            var newChat = _mapper.Map<Chat>(chatReadDto);
+            var oldChat = await _talkDbContext.Chat.Include(c => c.Messages).FirstOrDefaultAsync(c => c.Id == newChat.Id, cancellationToken);
+            if (oldChat is not null)
+            {
+                oldChat.SenderId = newChat.SenderId;
+                oldChat.ReceiverId = newChat.ReceiverId;
+            }
+            return newChat;
         }
         #endregion
 

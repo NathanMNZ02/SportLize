@@ -30,8 +30,8 @@ namespace SportLize.Profile.Api.Profile.Repository
             modelBuilder.Entity<TransactionalOutbox>().Property(s => s.Id).ValueGeneratedOnAdd();
 
             //Relation one to many
-            modelBuilder.Entity<User>().HasMany(s => s.Posts).WithOne(s => s.User).HasForeignKey(s => s.UserId);
-            modelBuilder.Entity<Post>().HasMany(S => S.Comments).WithOne(s => s.Post).HasForeignKey(s => s.PostId);
+            modelBuilder.Entity<User>().HasMany(s => s.Posts).WithOne(s => s.User).HasForeignKey(s => s.UserId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(S => S.Comments).WithOne(s => s.Post).HasForeignKey(s => s.PostId).OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -16,7 +16,7 @@ namespace SportLize.Profile.Api.Profile.Repository.Model
         public DateTime DateOfBorn { get; set; }
 
         //Navigation Followers/Following 
-        public List<User> Followers { get; } = new List<User>();
+        public List<User> Followers { get; set; } = new List<User>();
 
 		//Navigation Post
 		public List<Post> Posts { get; set; } = new List<Post>();

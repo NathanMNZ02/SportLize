@@ -104,23 +104,46 @@ namespace SportLize.Profile.Api.Profile.Repository
         #region UPDATE
         public async Task<User> UpdateUser(UserReadDto userReadDto, CancellationToken cancellationToken = default)
         {
-            var user = _mapper.Map<User>(userReadDto);
-            _profileDbContext.User.Update(user);
-            return user;
+            var newUser = _mapper.Map<User>(userReadDto);
+            var oldUser = await _profileDbContext.User.Include(s => s.Followers).Include(s => s.Posts).FirstOrDefaultAsync(s => s.Id == newUser.Id);
+            if(oldUser is not null)
+            {
+                oldUser.Actor = newUser.Actor;
+                oldUser.Nickname = newUser.Nickname;
+                oldUser.Name = newUser.Name;
+                oldUser.Surname = newUser.Surname;
+                oldUser.Password = newUser.Password;
+                oldUser.Description = newUser.Description;
+                oldUser.DateOfBorn = newUser.DateOfBorn;
+            }
+            return newUser;
         }
 
         public async Task<Post> UpdatePost(PostReadDto postReadDto, CancellationToken cancellationToken = default)
         {
-            var post = _mapper.Map<Post>(postReadDto);
-            _profileDbContext.Post.Update(post);
-            return post;
+            var newPost = _mapper.Map<Post>(postReadDto);
+            var oldPost = await _profileDbContext.Post.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == newPost.Id, cancellationToken);
+            if (oldPost is not null)
+            {
+                oldPost.Media = newPost.Media;
+                oldPost.Like = newPost.Like;
+                oldPost.PubblicationDate = newPost.PubblicationDate;
+                oldPost.Description = newPost.Description;
+            }
+            return newPost;
         }
 
         public async Task<Comment> UpdateComment(CommentReadDto commentReadDto, CancellationToken cancellationToken = default)
         {
-            var comment = _mapper.Map<Comment>(commentReadDto);
-            _profileDbContext.Comment.Update(comment);
-            return comment;
+            var newComment = _mapper.Map<Comment>(commentReadDto);
+            var oldComment = await _profileDbContext.Comment.FirstOrDefaultAsync(c => c.Id == newComment.Id, cancellationToken);
+            if (oldComment is not null)
+            {
+                oldComment.Text = newComment.Text;
+                oldComment.Like = newComment.Like;
+                oldComment.PubblicationDate = newComment.PubblicationDate;
+            }
+            return newComment;
         }
         #endregion
 
