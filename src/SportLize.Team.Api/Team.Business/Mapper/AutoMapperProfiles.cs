@@ -1,4 +1,5 @@
 ﻿
+using SportLize.Profile.Api.Profile.Shared.Dto;
 using SportLize.Team.Api.Team.Repository.Model;
 using SportLize.Team.Api.Team.Shared.Dto;
 
@@ -16,6 +17,9 @@ namespace SportLize.Team.Api.Team.Business.Mapper
             CreateMap<Message, MessageReadDto>();
             CreateMap<MessageWriteDto, Message>();
             CreateMap<Message, MessageWriteDto>();
+
+            CreateMap<UserKafka, UserReadDto>();
+            CreateMap<UserReadDto, UserKafka>();
         }
     }
 }

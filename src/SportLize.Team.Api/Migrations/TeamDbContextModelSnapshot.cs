@@ -114,7 +114,7 @@ namespace SportLize.Team.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -159,13 +159,9 @@ namespace SportLize.Team.Api.Migrations
 
             modelBuilder.Entity("SportLize.Team.Api.Team.Repository.Model.UserKafka", b =>
                 {
-                    b.HasOne("SportLize.Team.Api.Team.Repository.Model.Group", "Group")
+                    b.HasOne("SportLize.Team.Api.Team.Repository.Model.Group", null)
                         .WithMany("UsersKafka")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
+                        .HasForeignKey("GroupId");
                 });
 
             modelBuilder.Entity("SportLize.Team.Api.Team.Repository.Model.Group", b =>

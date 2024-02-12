@@ -40,9 +40,8 @@ namespace SportLize.Profile.Api.Profile.Repository
         #region INSERT
         public async Task<User> InsertUser(UserWriteDto userWriteDto, CancellationToken cancellationToken = default)
         {
-            var user = _mapper.Map<User>(userWriteDto);
-            await _profileDbContext.User.AddAsync(user, cancellationToken);
-            return user;
+            var result = await _profileDbContext.User.AddAsync(_mapper.Map<User>(userWriteDto), cancellationToken); 
+            return result.Entity;
         }
 
         public async Task<User?> InsertFollowerToUser(int userId, int followerId, CancellationToken cancellationToken = default)

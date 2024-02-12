@@ -10,10 +10,6 @@ using SportLize.Team.Api.Team.Repository.Abstraction;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string? dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-string? dbName = Environment.GetEnvironmentVariable("DB_NAME");
-string? dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
-
 builder.Services.AddDbContext<TeamDbContext>(options => options.UseSqlServer("name=ConnectionStrings:TeamDbContext",
     b => b.MigrationsAssembly("SportLize.Team.Api")));
 

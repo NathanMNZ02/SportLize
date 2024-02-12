@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SportLize.Team.Api.Team.Business.Abstraction;
+using SportLize.Team.Api.Team.Repository.Model;
 
 namespace SportLize.Team.Api.Controller
 {
@@ -15,6 +16,10 @@ namespace SportLize.Team.Api.Controller
             _business = business;
             _logger = logger;
         }
+
+        [HttpPost(Name = "InsertUserToGroup")]
+        public async Task<ActionResult> InsertUserToGroup([FromQuery] int groupId, [FromBody] UserKafka userKafka) =>
+            Ok(await _business.InsertUserToGroup(groupId, userKafka));
 
         [HttpPost(Name = "GetAllUserKafkaOfGroup")]
         public async Task<ActionResult> GetAllUserKafkaOfGroup(int groupId) =>

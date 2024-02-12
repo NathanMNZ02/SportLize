@@ -86,12 +86,12 @@ public class Repository : IRepository
 
     public async Task<List<UserKafka>?> GetAllUserKafkaOfGroup(int groupId, CancellationToken cancellationToken = default)
     {
-        var group = await _teamDbContext.Group.Include(s => s.Id == groupId).FirstOrDefaultAsync(cancellationToken);
+        var group = await _teamDbContext.Group.Include(s => s.UsersKafka).FirstOrDefaultAsync(cancellationToken);
         return group?.UsersKafka;
     }
     public async Task<List<Message>?> GetAllMessagesOfGroup(int groupId, CancellationToken cancellationToken = default)
     {
-        var group = await _teamDbContext.Group.Include(s => s.Id == groupId).FirstOrDefaultAsync(cancellationToken);
+        var group = await _teamDbContext.Group.Include(s => s.Messages).FirstOrDefaultAsync(cancellationToken);
         return group?.Messages;
     }
 
